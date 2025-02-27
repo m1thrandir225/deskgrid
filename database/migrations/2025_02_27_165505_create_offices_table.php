@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('offices', function (Blueprint $table) {
             $table->id();
+            $table->foreignId("employer_id")->constrained();
+            $table->string("name");
+            $table->string("address")->nullable();
+            $table->string("floor_plan_image")->nullable();
             $table->timestamps();
         });
     }
