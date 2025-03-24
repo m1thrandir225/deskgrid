@@ -11,8 +11,17 @@ class Desk extends Model
     /** @use HasFactory<\Database\Factories\DeskFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'office_id',
+        'desk_number',
+        'location_description',
+        'x_position',
+        'y_position',
+        'is_active'
+    ];
 
-    public function reservations(): HasMany {
+    public function reservations(): HasMany
+    {
         return $this->hasMany(Reservation::class);
     }
 }
