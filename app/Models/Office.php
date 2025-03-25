@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Office extends Model
@@ -18,8 +19,13 @@ class Office extends Model
         'floor_plan_image'
     ];
 
-    public function desks(): HasMany
+    public function employer(): BelongsTo
     {
-        return $this->HasMany(Desk::class);
+        return $this->belongsTo(User::class);
+    }
+
+    public function floors(): HasMany
+    {
+        return $this->hasMany(Floor::class);
     }
 }
