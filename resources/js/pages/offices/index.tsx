@@ -1,4 +1,4 @@
-import OfficeListItem from '@/components/office-list-item';
+import OfficeListItem from '@/components/office/office-list-item';
 import { type Office } from '@/types/office';
 interface PageProps {
     offices: Office[];

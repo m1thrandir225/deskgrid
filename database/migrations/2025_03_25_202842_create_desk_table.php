@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('desks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("office_id")->constrained();
+            $table->foreignId('floor_id')->constrained();
             $table->string("desk_number");
             $table->string("location_description")->nullable();
             $table->integer("x_position");
