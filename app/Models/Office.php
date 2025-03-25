@@ -12,7 +12,7 @@ class Office extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employer_id',
+        'user_id',
         'name',
         'address',
         'floor_plan_image'

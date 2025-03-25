@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\DeskController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->group(function () {
-    //TODO: add the routes for DeskModel
-});
+Route::resource('desk', DeskController::class)
+    ->middleware('auth');
