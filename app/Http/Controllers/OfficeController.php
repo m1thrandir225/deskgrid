@@ -96,7 +96,7 @@ class OfficeController extends Controller
     }
 
     /*
-    * Handle a elete request
+    * Handle a delete request
     */
     public function destroy(Office $office): RedirectResponse
     {
