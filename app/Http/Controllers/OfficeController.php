@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Office\UpdateOfficeRequest;
 use App\Models\Office;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use UpdateOfficeRequest;
 
 class OfficeController extends Controller
 {
@@ -20,6 +20,7 @@ class OfficeController extends Controller
         $user = $request->user();
 
         $offices = Office::query()->where('user_id', $user->id)->get();
+
         return Inertia::render('offices/index', [
             'offices' => $offices
         ]);
@@ -29,8 +30,7 @@ class OfficeController extends Controller
     */
     public function create(Request $request): Response
     {
-        return Inertia::render('offices/create', [
-        ]);
+        return Inertia::render('offices/create');
     }
 
     /**
@@ -43,7 +43,6 @@ class OfficeController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'floor_plan_image' => 'required|string'
         ]);
 
         $user = $request->user();
@@ -51,11 +50,10 @@ class OfficeController extends Controller
         Office::create([
             'name' => $request->name,
             'address' => $request->address,
-            'floor_plan_image' => $request->floor_plan_image,
-            'employer_id' => $user->id
+            'user_id' => $user->id
         ]);
 
-        return to_route('offices/index');
+        return to_route('offices.index');
     }
 
     /**
@@ -64,8 +62,7 @@ class OfficeController extends Controller
     */
     public function show(Request $request)
     {
-        $office = Office::query()->where('id', $request->office)->with(['desks'])->first();
-
+        $office = Office::query()->where('id', $request->office)->with(['floors'])->first();
 
         return Inertia::render('offices/show', [
             'office' => $office,
@@ -77,7 +74,7 @@ class OfficeController extends Controller
     */
     public function edit(Office $office)
     {
-        return Inertia::render('office/edit', [
+        return Inertia::render('offices/edit', [
             'office' => $office,
         ]);
     }
@@ -86,30 +83,25 @@ class OfficeController extends Controller
     * Handle an edit request for the resource
     */
 
-    public function update(UpdateOfficeRequest $request)
+    public function update(UpdateOfficeRequest $request, Office $office): RedirectResponse
     {
-        $request->validated();
+        $validated = $request->validated();
 
-        $user = $request->user();
-
-
-        Office::query()->where('id', $request->id)->update([
-            'name' => $user
+        $office->update([
+            'name' => $validated['name'],
+            'address' => $validated['address']
         ]);
-    }
 
-    /*
-    * Show the destroy page
-    * TODO: might not be needed
-    */
-    public function destroy()
-    {
+        return to_route('offices.show', $office->id);
     }
 
     /*
     * Handle a elete request
     */
-    public function delete()
+    public function destroy(Office $office): RedirectResponse
     {
+        $office->delete();
+        return to_route('offices.index');
+
     }
 }

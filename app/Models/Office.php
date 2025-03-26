@@ -16,7 +16,6 @@ class Office extends Model
         'user_id',
         'name',
         'address',
-        'floor_plan_image'
     ];
 
     public function employer(): BelongsTo

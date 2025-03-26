@@ -30,4 +30,9 @@ class Desk extends Model
     {
         return $this->hasMany(Reservation::class);
     }
+
+    public function isCurrentlyReserved()
+    {
+        return $this->reservations()->where('reserved_until', '>', now())->exists();
+    }
 }
