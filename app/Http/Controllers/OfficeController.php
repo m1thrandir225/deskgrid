@@ -6,6 +6,7 @@ use App\Http\Requests\Office\UpdateOfficeRequest;
 use App\Models\Office;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -30,6 +31,8 @@ class OfficeController extends Controller
     */
     public function create(Request $request): Response
     {
+        Gate::authorize('create', Office::class);
+
         return Inertia::render('offices/create');
     }
 
@@ -40,6 +43,7 @@ class OfficeController extends Controller
     */
     public function store(Request $request): RedirectResponse
     {
+        Gate::authorize('create', Office::class);
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
@@ -60,9 +64,10 @@ class OfficeController extends Controller
     * Show the current desk
     * -> should include all desks
     */
-    public function show(Request $request)
+    public function show(Office $office)
     {
-        $office = Office::query()->where('id', $request->office)->with(['floors'])->first();
+
+        Gate::authorize('view', $office);
 
         return Inertia::render('offices/show', [
             'office' => $office,
@@ -74,6 +79,8 @@ class OfficeController extends Controller
     */
     public function edit(Office $office)
     {
+        Gate::authorize('update', $office);
+
         return Inertia::render('offices/edit', [
             'office' => $office,
         ]);
@@ -85,6 +92,8 @@ class OfficeController extends Controller
 
     public function update(UpdateOfficeRequest $request, Office $office): RedirectResponse
     {
+        Gate::authorize('update', $office);
+
         $validated = $request->validated();
 
         $office->update([
@@ -100,6 +109,8 @@ class OfficeController extends Controller
     */
     public function destroy(Office $office): RedirectResponse
     {
+        Gate::authorize('delete', $office);
+
         $office->delete();
         return to_route('offices.index');
 
