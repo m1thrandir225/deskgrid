@@ -2,14 +2,13 @@
 
 namespace App\Http\Requests\Office;
 
-use App\Models\Office;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateOfficeRequest extends FormRequest
+class CreateOfficeRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
+    * Using policy gates to determine authorization
+    */
     public function authorize(): bool
     {
         return true;
@@ -23,8 +22,8 @@ class UpdateOfficeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'address' => 'required|string|max:255'
+            "name" => "required|string|max:255",
+            "address" => "required|string|max:255"
         ];
     }
 }

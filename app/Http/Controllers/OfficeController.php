@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Office\CreateOfficeRequest;
 use App\Http\Requests\Office\UpdateOfficeRequest;
 use App\Models\Office;
 use Illuminate\Http\RedirectResponse;
@@ -41,19 +42,16 @@ class OfficeController extends Controller
     *
     * @throws \Illuminate\Validation\ValidationException
     */
-    public function store(Request $request): RedirectResponse
+    public function store(CreateOfficeRequest $request): RedirectResponse
     {
         Gate::authorize('create', Office::class);
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-        ]);
 
+        $validated = $request->validated();
         $user = $request->user();
 
         Office::create([
-            'name' => $request->name,
-            'address' => $request->address,
+            'name' => $validated['name'],
+            'address' => $validated['address'],
             'user_id' => $user->id
         ]);
 

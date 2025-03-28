@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Requests\Office;
+namespace App\Http\Requests\Floor;
 
-use App\Models\Office;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateOfficeRequest extends FormRequest
+class CreateFloorRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
+    * Using policy gates to determine authorization
+    */
     public function authorize(): bool
     {
         return true;
@@ -23,8 +22,9 @@ class UpdateOfficeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'address' => 'required|string|max:255'
-        ];
+                    'office_id' => "required|exists:offices",
+                    'name' => 'required|string|max:255',
+                    'plan_image' => 'image|size:51200' //50MB
+                ];
     }
 }
