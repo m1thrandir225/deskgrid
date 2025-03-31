@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Floor\CreateFloorRequest;
 use App\Http\Requests\Floor\UpdateFloorRequest;
 use App\Models\Floor;
-use App\Models\Office;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
