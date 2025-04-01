@@ -17,7 +17,11 @@ class DeskFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'desk_number' => fake()->buildingNumber(),
+            'location_description' => fake()->realText(),
+            'x_position' => fake()->numberBetween(0, 1280),
+            "y_position" => fake()->numberBetween(0, 900),
+            'is_active' => fake()->boolean()
         ];
     }
 }

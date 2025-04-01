@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ReservationStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,22 @@ class ReservationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'reservation_date' => fake()->dateTimeBetween('+1day', '+1 year'),
+            'status' => ReservationStatus::Approved
         ];
+    }
+
+    public function cancelled()
+    {
+        return $this->state([
+            'status' => ReservationStatus::Cancelled
+        ]);
+    }
+
+    public function pending()
+    {
+        return $this->state([
+            'status' => ReservationStatus::Pending
+        ]);
     }
 }

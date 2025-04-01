@@ -82,7 +82,10 @@ class DeskController extends Controller
         $validated = $request->validated();
 
         $desk->update([
-            ''
+            'desk_number' => $validated['desk_number'],
+            'location_description' => $validated['location_description'],
+            'x_position' => $validated['x_position'],
+            'y_position' => $validated['y_position']
         ]);
         return to_route('desks.show', $desk->id);
     }

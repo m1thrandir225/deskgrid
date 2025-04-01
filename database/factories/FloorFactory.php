@@ -17,7 +17,8 @@ class FloorFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "name" => fake()->userName(),
+            "plan_image" => fake()->imageUrl()
         ];
     }
 }
