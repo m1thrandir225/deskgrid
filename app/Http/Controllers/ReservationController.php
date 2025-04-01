@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ReservationStatus;
+use App\Http\Requests\Reservation\CreateReservationRequest;
+use App\Http\Requests\Reservation\UpdateReservationRequest;
 use App\Models\Reservation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,8 +19,8 @@ class ReservationController extends Controller
     */
     public function create(Request $request): Response
     {
-        return Inertia::render('desk/create', [
-        ]);
+        Gate::authorize('create', Reservation::class);
+        return Inertia::render('desk/create');
     }
 
     /**
@@ -24,54 +28,72 @@ class ReservationController extends Controller
     *
     * @throws \Illuminate\Validation\ValidationException
     */
-    public function store(Request $request): RedirectResponse
+    public function store(CreateReservationRequest $request): RedirectResponse
     {
-        $request->validate([
+        Gate::authorize('create', Reservation::class);
 
+        $validated = $request->validated();
+
+        Reservation::create([
+            'desk_id' => $validated['desk_id'],
+            'user_id' => $validated['user_id'],
+            'reservation_date' => $validated['reservation_date'],
+            'status' => ReservationStatus::Approved
         ]);
 
-        $desk = Reservation::create([
-
-        ]);
-
-        return to_route('dashboard');
+        return to_route('desks.show', $validated['desk_id']);
     }
 
     /**
     * Show the current reservation
     */
-    public function show(Request $request)
+    public function show(Reservation $reservation): Response
     {
-
+        Gate::authorize('show', $reservation);
+        return Inertia::render('reservations/show', [
+            'reservation' => $reservation
+        ]);
     }
 
     /*
     * Show the edit form
     */
-    public function edit(Request $request)
+    public function edit(Reservation $reservation): Response
     {
+        Gate::authorize('update', $reservation);
+
+        return Inertia::render('reservations/edit', [
+            'reservation' => $reservation
+        ]);
     }
 
     /*
     * Handle an edit request for the resource
     */
 
-    public function update(Request $request)
+    public function update(UpdateReservationRequest $request, Reservation $reservation): RedirectResponse
     {
+        Gate::authorize('update', $reservation);
+
+        $validated = $request->validated();
+
+        $reservation->update([
+            'status' => $validated['status'],
+            'reservation_date' => $validated['reservation_date']
+        ]);
+
+        return to_route('desks.show', $reservation->desk_id);
     }
 
     /*
-    * Show the destroy page
-    * TODO: might not be needed
+    * Handle a delete request
     */
-    public function destroy()
+    public function delete(Reservation $reservation): RedirectResponse
     {
-    }
+        Gate::authorize('delete', $reservation);
 
-    /*
-    * Handle a elete request
-    */
-    public function delete()
-    {
+        $reservation->delete();
+
+        return to_route('reservations.index');
     }
 }

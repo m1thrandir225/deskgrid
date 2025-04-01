@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Desk;
+namespace App\Http\Requests\Reservation;
 
+use App\Enums\ReservationStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateDeskRequest extends FormRequest
+class UpdateReservationRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -14,10 +16,8 @@ class UpdateDeskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "desk_number" => "required|number|gt:0",
-            "location_description" => "required|string",
-            "x_position" => "required|number",
-            "y_position" => "required|number",
+            "reservation_date" => "required|after:today",
+            "status" => [Rule::enum(ReservationStatus::class)],
         ];
     }
 }

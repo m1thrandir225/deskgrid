@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Desk;
+namespace App\Http\Requests\Reservation;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateDeskRequest extends FormRequest
+class CreateReservationRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -14,10 +14,9 @@ class UpdateDeskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "desk_number" => "required|number|gt:0",
-            "location_description" => "required|string",
-            "x_position" => "required|number",
-            "y_position" => "required|number",
+            "desk_id" => "required|exists:desks",
+            "user_id" => "required|exists:users",
+            "reservation_date" => "required|after:today",
         ];
     }
 }
