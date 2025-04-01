@@ -21,6 +21,8 @@ class OfficeController extends Controller
     {
         $user = $request->user();
 
+        Gate::authorize('viewAny', $user);
+
         $offices = Office::query()->where('user_id', $user->id)->get();
 
         return Inertia::render('offices/index', [

@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Desk\CreateDeskRequest;
+use App\Http\Requests\Desk\UpdateDeskRequest;
 use App\Models\Desk;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,6 +18,8 @@ class DeskController extends Controller
     */
     public function create(Request $request): Response
     {
+        Gate::authorize('create', Desk::class);
+
         return Inertia::render('desk/create', [
         ]);
     }
@@ -24,14 +29,18 @@ class DeskController extends Controller
     *
     * @throws \Illuminate\Validation\ValidationException
     */
-    public function store(Request $request): RedirectResponse
+    public function store(CreateDeskRequest $request): RedirectResponse
     {
-        $request->validate([
+        Gate::authorize('create', Desk::class);
 
-        ]);
+        $validated = $request->validated();
 
-        $desk = Desk::create([
-
+        Desk::create([
+            'floor_id' => $validated['floor_id'],
+            'desk_number' => $validated['desk_number'],
+            'location_description' => $validated['location_description'],
+            'x_position' => $validated['x_position'],
+            'y_position' => $validated['y_position']
         ]);
 
         return to_route('dashboard');
@@ -41,38 +50,52 @@ class DeskController extends Controller
     * Show the current desk
     * -> should include all reservations
     */
-    public function show(Request $request)
+    public function show(Desk $desk): Response
     {
+        Gate::authorize('view', $desk);
 
+        return Inertia::render('desks/show', [
+            'desk' => $desk
+        ]);
     }
 
     /*
     * Show the edit form
     */
-    public function edit(Request $request)
+    public function edit(Desk $desk): Response
     {
+        Gate::authorize('update', $desk);
+        return Inertia::render("desks/edit", [
+            "desk" => $desk
+        ]);
     }
 
     /*
     * Handle an edit request for the resource
     */
 
-    public function update(Request $request)
+    public function update(UpdateDeskRequest $request, Desk $desk): RedirectResponse
     {
+        Gate::authorize('update', $desk);
+
+
+        $validated = $request->validated();
+
+        $desk->update([
+            ''
+        ]);
+        return to_route('desks.show', $desk->id);
     }
 
-    /*
-    * Show the destroy page
-    * TODO: might not be needed
-    */
-    public function destroy()
-    {
-    }
 
     /*
-    * Handle a elete request
+    * Handle a delete request
     */
-    public function delete()
+    public function delete(Desk $desk): RedirectResponse
     {
+        Gate::authorize('delete', $desk);
+
+        $desk->delete();
+        return to_route('desks.index');
     }
 }
