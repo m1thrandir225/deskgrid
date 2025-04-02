@@ -21,7 +21,9 @@ class FloorPolicy
      */
     public function view(User $user, Floor $floor): bool
     {
-        $floor_user_id = $floor->office()->employer()->id;
+        $floor->load('office.user');
+
+        $floor_user_id = $floor->office->user->id;
         return $user->id === $floor_user_id;
     }
 
@@ -38,7 +40,9 @@ class FloorPolicy
      */
     public function update(User $user, Floor $floor): bool
     {
-        $floor_user_id = $floor->office()->employer()->id;
+        $$floor->load('office.user');
+
+        $floor_user_id = $floor->office->user->id;
 
         return $user->id === $floor_user_id;
     }
@@ -48,7 +52,9 @@ class FloorPolicy
      */
     public function delete(User $user, Floor $floor): bool
     {
-        $floor_user_id = $floor->office()->employer()->id;
+        $floor->load('office.user');
+
+        $floor_user_id = $floor->office->user->id;
 
         return $user->id === $floor_user_id;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Http\Requests\Office\CreateOfficeRequest;
 use App\Http\Requests\Office\UpdateOfficeRequest;
 use App\Models\Office;
@@ -20,8 +21,6 @@ class OfficeController extends Controller
     public function index(Request $request): Response
     {
         $user = $request->user();
-
-        Gate::authorize('viewAny', $user);
 
         $offices = Office::query()->where('user_id', $user->id)->get();
 
@@ -69,6 +68,7 @@ class OfficeController extends Controller
 
         Gate::authorize('view', $office);
 
+        $office->load('floors');
         return Inertia::render('offices/show', [
             'office' => $office,
         ]);

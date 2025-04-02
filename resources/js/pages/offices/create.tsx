@@ -28,7 +28,6 @@ const CreateOfficePage: React.FC = () => {
     });
 
     const handleSubmit: FormEventHandler = (e) => {
-        console.log(e);
         e.preventDefault();
         post(route('offices.store'), {
             onFinish: () => {

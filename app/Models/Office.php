@@ -18,7 +18,7 @@ class Office extends Model
         'address',
     ];
 
-    public function employer(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

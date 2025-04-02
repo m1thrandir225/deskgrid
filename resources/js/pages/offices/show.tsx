@@ -1,9 +1,10 @@
+import FloorTable from '@/components/floor/floor-table';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
 import OfficesLayout from '@/layouts/offices/layout';
 import type { Office } from '@/types/office';
 import { Link, useForm } from '@inertiajs/react';
-import { Edit2, TrashIcon } from 'lucide-react';
+import { Edit2, Plus, TrashIcon } from 'lucide-react';
 import { FormEventHandler, useMemo } from 'react';
 
 interface PageProps {
@@ -12,6 +13,8 @@ interface PageProps {
 
 const OfficeShowPage: React.FC<PageProps> = (props) => {
     const { office } = props;
+
+    const floors = office.floors;
     const breadcrumbs = useMemo(() => {
         return [
             {
@@ -45,6 +48,17 @@ const OfficeShowPage: React.FC<PageProps> = (props) => {
                     </Button>
                 </form>
             </OfficeLayoutHeader>
+            <div className="flex flex-col items-start">
+                <div className="flex w-full flex-row items-center justify-between">
+                    <h1> Floors </h1>
+                    <Button asChild size={'icon'} variant={'outline'}>
+                        <Link href={`/offices/${office.id}/floors/create`}>
+                            <Plus size={24} />
+                        </Link>
+                    </Button>
+                </div>
+                {floors && <FloorTable items={floors} officeId={office.id} />}
+            </div>
         </OfficesLayout>
     );
 };

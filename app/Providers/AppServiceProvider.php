@@ -16,7 +16,8 @@ class AppServiceProvider extends ServiceProvider
         //
         $this->app->bind(IStorageService::class, function ($app) {
             $disk = config('filesystems.default');
-            $root = config("filesystems.disks.{$disk}.root", "");
+            $root = config("filesystems.disks.{$disk}.root", '');
+
 
             return new StorageService($disk, $root);
         });

@@ -2,14 +2,13 @@
 
 namespace App\Http\Requests\Floor;
 
+use App\Models\Floor;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class CreateFloorRequest extends FormRequest
 {
-    /**
-    * Using policy gates to determine authorization
-    */
-    public function authorize(): bool
+    public function authorize()
     {
         return true;
     }
@@ -22,9 +21,14 @@ class CreateFloorRequest extends FormRequest
     public function rules(): array
     {
         return [
-                    'office_id' => "required|exists:offices",
-                    'name' => 'required|string|max:255',
-                    'plan_image' => 'image|size:51200' //50MB
-                ];
+            'office_id' => "required|exists:offices,id",
+            'name' => 'required|string|max:255',
+            'plan_image' => [
+               'required',
+                'image',
+                'mimes:png,jpeg,jpg,webp',
+                'max:10240' // 10MB in KB
+            ]
+        ];
     }
 }
