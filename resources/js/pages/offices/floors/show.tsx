@@ -1,3 +1,4 @@
+import FloorPlanEditor from '@/components/floor/floor-plan-editor';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
 import OfficesLayout from '@/layouts/offices/layout';
@@ -59,7 +60,7 @@ const FloorDetailsPage: React.FC<PageProps> = (props) => {
                     </Button>
                 </form>
             </OfficeLayoutHeader>
-            <img src={floor.plan_image_url} className="h-[300px] w-full object-cover" />
+            <FloorPlanEditor initialImage={floor.plan_image_url ?? ''} initialDesks={[]} onSave={() => console.log('hello')} />
         </OfficesLayout>
     );
 };
