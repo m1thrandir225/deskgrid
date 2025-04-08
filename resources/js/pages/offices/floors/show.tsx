@@ -1,4 +1,4 @@
-import FloorPlanEditor from '@/components/floor/floor-plan-editor';
+import FloorPlanEditor from '@/components/floor/plan-editor';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
 import OfficesLayout from '@/layouts/offices/layout';
