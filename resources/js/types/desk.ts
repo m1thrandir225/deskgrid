@@ -20,13 +20,13 @@ export interface DeskDTO {
     x_position: number;
     y_position: number;
 }
-
 export interface EditorDesk extends Omit<Desk, 'office_id' | 'id'> {
     id?: number;
     clientId: number;
     office_id: number;
     status: 'initial' | 'new' | 'updated' | 'deleted';
 }
+
 export function modelToDTO(model: Desk): DeskDTO {
     return {
         desk_number: model.desk_number,
