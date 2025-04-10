@@ -28,7 +28,7 @@ export default function Index({ offices }: PageProps) {
                     </Link>
                 </Button>
             </OfficeLayoutHeader>
-            <div className="flex w-full flex-col gap-4">
+            <div className="flex w-full flex-col gap-4 px-6 py-4">
                 {offices.map((office) => (
                     <OfficeListItem office={office} key={office.id} />
                 ))}
