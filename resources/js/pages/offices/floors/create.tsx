@@ -73,7 +73,6 @@ const CreateFloorPage: React.FC<PageProps> = (props) => {
     return (
         <OfficesLayout title={'Create a floor'} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title="Create a floor" description={`Create a floor for: ${office.name}`} />
-            <h1>{office.id}</h1>
             <FloorForm {...formProps} />
         </OfficesLayout>
     );

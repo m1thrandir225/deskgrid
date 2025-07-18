@@ -78,7 +78,6 @@ class DeskController extends Controller
     {
         Gate::authorize('update', $desk);
 
-
         $validated = $request->validated();
 
         $desk->update([

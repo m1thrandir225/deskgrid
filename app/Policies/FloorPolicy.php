@@ -40,7 +40,7 @@ class FloorPolicy
      */
     public function update(User $user, Floor $floor): bool
     {
-        $$floor->load('office.user');
+        $floor->load('office.user');
 
         $floor_user_id = $floor->office->user->id;
 

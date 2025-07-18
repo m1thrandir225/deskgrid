@@ -73,12 +73,14 @@ class FloorController extends Controller
         ]);
     }
 
-    public function edit(Floor $floor): Response
+    public function edit(Office $office, Floor $floor): Response
     {
         Gate::authorize('update', $floor);
 
-        return Inertia::render('floors/edit', [
+        return Inertia::render('offices/floors/edit', [
+            "office" => $office,
             "floor" => $floor,
+            "floor_plan_url" => Storage::url($floor["plan_image"])
         ]);
     }
 

@@ -15,6 +15,8 @@ const ErrorPage: React.FC<PageProps> = ({ status }) => {
                 return '404: Page Not Found';
             case 403:
                 return '403: Forbidden';
+            case 302:
+                return '302: Found';
             default:
                 return `Error ${status.toString()}`;
         }
@@ -30,6 +32,8 @@ const ErrorPage: React.FC<PageProps> = ({ status }) => {
                 return 'Sorry, the page you are looking for could not be found.';
             case 403:
                 return 'Sorry, you are forbidden from accessing this page.';
+            case 302:
+                return 'The requested resource has been temporarily moved to a different URL.';
             default:
                 return 'Something went wrong.';
         }

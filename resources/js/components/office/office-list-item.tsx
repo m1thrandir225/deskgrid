@@ -15,7 +15,7 @@ const OfficeListItem: React.FC<Props> = ({ office }) => {
     return (
         <Link
             href={itemHref}
-            className="bg-primary text-primary-foreground group flex w-full flex-row items-center justify-between rounded-md px-8 py-2 transition-opacity duration-300 ease-in-out hover:opacity-90"
+            className="bg-background text-primary group flex w-full flex-row items-center justify-between rounded-md px-4 py-2 border transition-all duration-300 ease-in-out hover:border-accent-foreground/50 hover:opacity-90"
         >
             <div className="flex flex-col items-start gap-1">
                 <h1> {office.name} </h1>
@@ -24,7 +24,7 @@ const OfficeListItem: React.FC<Props> = ({ office }) => {
                     <span>{office.address}</span>
                 </div>
             </div>
-            <ArrowRightIcon className="transition-all duration-150 ease-in-out group-hover:scale-150" />
+            <ArrowRightIcon className="transition-all duration-150 ease-in-out" />
         </Link>
     );
 };

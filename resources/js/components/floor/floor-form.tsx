@@ -31,7 +31,7 @@ const FloorForm: React.FC<FloorFormProps> = (props) => {
         }
     };
     return (
-        <form className="flex flex-col gap-6 rounded-md border p-8" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-6 rounded-md border p-8 w-auto mx-auto" onSubmit={onSubmit}>
             <div className="grid gap-2">
                 <Label htmlFor="name">Floor Name</Label>
                 <Input
