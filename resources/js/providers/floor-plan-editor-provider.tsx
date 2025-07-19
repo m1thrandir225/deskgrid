@@ -1,24 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Floor } from '@/types/floor';
 import { Office } from '@/types/office';
+import { Floor } from '@/types/floor';
+import FloorPlanEditorContext from '@/contexts/plan-editor-context';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { EditorDesk } from '@/types/desk';
-import { Move, Plus, Redo, Save, Trash2, Undo } from 'lucide-react';
-import { getFileUrl } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { router } from "@inertiajs/react"
-import PlanEditorDeskListItem from '@/components/floor/plan-editor/plan-editor-desk-list-item';
-interface ComponentProps {
-    office: Office,
-    floor: Floor
-}
+import { router } from '@inertiajs/react';
 
 interface HistoryState {
     desks: EditorDesk[];
     nextClientId: number;
 }
 
-const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
+const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
     const { floor, office } = props;
+
     const [editorDesks, setEditorDesks] = useState<EditorDesk[]>([]);
     const [selectedDeskId, setSelectedDeskId] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -31,8 +25,8 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
     const [historyIndex, setHistoryIndex] = useState(-1);
     const [isUpdatingFromHistory, setIsUpdatingFromHistory] = useState(false);
 
-    const floorPlanRef = useRef<HTMLDivElement>(null);
-    const imageRef = useRef<HTMLImageElement>(null);
+    const floorPlanRef = useRef<HTMLDivElement | null>(null);
+    const imageRef = useRef<HTMLImageElement | null>(null);
 
     // Initialize desks and create initial history state
     useEffect(() => {
@@ -345,79 +339,39 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
     const canUndo = historyIndex > 0;
     const canRedo = historyIndex < history.length - 1;
 
+    return {
+        editorDesks,
+        visibleDesks,
+        selectedDeskId,
+        setSelectedDeskId,
+        canUndo,
+        canRedo,
+        historyState: { current: historyIndex + 1, total: history.length },
+        floorPlanRef,
+        imageRef,
+        handleImageLoad,
+        handleMouseDown,
+        handleMouseMove,
+        handleMouseUp,
+        addDesk,
+        deleteDesk,
+        undo,
+        redo,
+        selectDeskId: selectedDeskId,
+        selectDesk: (clientId: number | null) => setSelectedDeskId(clientId),
+        saveChanges: handleSave,
+    }
+
+}
+
+export const FloorPlanEditorProvider: React.FC<{ children: React.ReactNode, office: Office, floor: Floor }> = (props) => {
+    const { children, floor, office} = props;
+
+    const value = useFloorPlanEditorState({ floor, office });
+
     return (
-        <div className="h-auto bg-background flex flex-col">
-            {/* Header */}
-            <div className="bg-background border-b px-4 pb-4 ">
-                <div className="flex justify-between items-center">
-                    <h1 className={"text-lg font-extrabold"}>Desk orientation</h1>
-                    <div className="flex gap-3">
-                        <div className="flex gap-1">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={undo}
-                                disabled={!canUndo}
-                                title="Undo (Ctrl+Z)"
-                            >
-                                <Undo size={16}/>
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={redo}
-                                disabled={!canRedo}
-                                title="Redo (Ctrl+Shift+Z)"
-                            >
-                                <Redo size={16}/>
-                            </Button>
-                        </div>
-                        <Button onClick={addDesk}>
-                            <Plus size={16}/>
-                            Add Desk
-                        </Button>
-                        <Button variant={"outline"} onClick={handleSave}>
-                            <Save size={16}/>
-                            Save Changes
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Content */}
-            <div className="grid grid-cols-3">
-
-                <div className="bg-background w-full h-full col-span-1" >
-                    <div className="p-4 border-b">
-                        <h2 className="text-lg font-semibold text-gray-900">Desks</h2>
-                        <p className="text-sm text-gray-600">{visibleDesks.length} total desks</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                            History: {historyIndex + 1}/{history.length}
-                        </p>
-                    </div>
-
-                    <div className="h-auto overflow-y-scroll max-h-[500px]">
-                        {visibleDesks.length === 0 ? (
-                            <div className="p-4 text-center text-gray-500">
-                                No desks yet. Click "Add Desk" to get started.
-                            </div>
-                        ) : (
-                            <div className="space-y-2 p-4">
-                                {visibleDesks.map(desk => (
-                                    <PlanEditorDeskListItem
-                                        desk={desk}
-                                        selectDesk={() => setSelectedDeskId(desk.clientId)}
-                                        deleteDesk={() => deleteDesk(desk.clientId)}
-                                        isSelected={selectedDeskId === desk.clientId}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default FloorPlanEditor;
+        <FloorPlanEditorContext.Provider value={value}>
+            {children}
+        </FloorPlanEditorContext.Provider>
+    )
+}
