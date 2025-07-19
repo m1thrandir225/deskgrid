@@ -2,18 +2,22 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Floor } from '@/types/floor';
 import { Office } from '@/types/office';
 import { EditorDesk } from '@/types/desk';
-import { Move, Plus, Save, Trash2 } from 'lucide-react';
+import { Move, Plus, Redo, Save, Trash2, Undo } from 'lucide-react';
 import { getFileUrl } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-
+import { router } from "@inertiajs/react"
 interface ComponentProps {
     office: Office,
     floor: Floor
+}
 
+interface HistoryState {
+    desks: EditorDesk[];
+    nextClientId: number;
 }
 
 const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
-    const { floor } = props;
+    const { floor, office } = props;
     const [editorDesks, setEditorDesks] = useState<EditorDesk[]>([]);
     const [selectedDeskId, setSelectedDeskId] = useState<number | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -21,10 +25,15 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
     const [nextClientId, setNextClientId] = useState(1000);
     const [floorPlanDimensions, setFloorPlanDimensions] = useState({ width: 0, height: 0 });
 
+    // History management
+    const [history, setHistory] = useState<HistoryState[]>([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
+    const [isUpdatingFromHistory, setIsUpdatingFromHistory] = useState(false);
+
     const floorPlanRef = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLImageElement>(null);
 
-    // Initialize editor desks from existing floor data
+    // Initialize desks and create initial history state
     useEffect(() => {
         if (floor.desks) {
             const initialDesks: EditorDesk[] = floor.desks.map(desk => ({
@@ -32,10 +41,101 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
                 clientId: desk.id || nextClientId,
                 status: 'initial'
             }));
+
+            const initialNextClientId = nextClientId + floor.desks.length;
+
             setEditorDesks(initialDesks);
-            setNextClientId(prev => prev + floor.desks!.length);
+            setNextClientId(initialNextClientId);
+
+            // Create initial history state
+            const initialState: HistoryState = {
+                desks: JSON.parse(JSON.stringify(initialDesks)), // Deep copy
+                nextClientId: initialNextClientId
+            };
+            setHistory([initialState]);
+            setHistoryIndex(0);
         }
-    }, [floor.desks, nextClientId]);
+    }, []);
+
+    // Save state to history (but not when updating from history)
+    const saveToHistory = useCallback((desks: EditorDesk[], nextId: number) => {
+        if (isUpdatingFromHistory) return;
+
+        const newState: HistoryState = {
+            desks: JSON.parse(JSON.stringify(desks)), // Deep copy
+            nextClientId: nextId
+        };
+
+        setHistory(prev => {
+            // Remove any future history if we're not at the end
+            const newHistory = prev.slice(0, historyIndex + 1);
+            newHistory.push(newState);
+
+            // Limit history size to 50 states
+            if (newHistory.length > 50) {
+                newHistory.shift();
+                return newHistory;
+            }
+
+            return newHistory;
+        });
+
+        setHistoryIndex(prev => {
+            const newIndex = prev + 1;
+            return newIndex >= 50 ? 49 : newIndex;
+        });
+    }, [historyIndex, isUpdatingFromHistory]);
+
+    // Undo function
+    const undo = useCallback(() => {
+        if (historyIndex <= 0) return;
+
+        const prevIndex = historyIndex - 1;
+        const prevState = history[prevIndex];
+
+        setIsUpdatingFromHistory(true);
+        setEditorDesks(JSON.parse(JSON.stringify(prevState.desks)));
+        setNextClientId(prevState.nextClientId);
+        setHistoryIndex(prevIndex);
+        setSelectedDeskId(null);
+
+        // Reset the flag after state updates
+        setTimeout(() => setIsUpdatingFromHistory(false), 0);
+    }, [history, historyIndex]);
+
+    // Redo function
+    const redo = useCallback(() => {
+        if (historyIndex >= history.length - 1) return;
+
+        const nextIndex = historyIndex + 1;
+        const nextState = history[nextIndex];
+
+        setIsUpdatingFromHistory(true);
+        setEditorDesks(JSON.parse(JSON.stringify(nextState.desks)));
+        setNextClientId(nextState.nextClientId);
+        setHistoryIndex(nextIndex);
+        setSelectedDeskId(null);
+
+        // Reset the flag after state updates
+        setTimeout(() => setIsUpdatingFromHistory(false), 0);
+    }, [history, historyIndex]);
+
+    // Handle keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
+                e.preventDefault();
+                undo();
+            } else if (((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Z') ||
+                ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
+                e.preventDefault();
+                redo();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [undo, redo]);
 
     // Handle floor plan image load to get dimensions
     const handleImageLoad = useCallback(() => {
@@ -65,30 +165,79 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
 
     // Add a new desk
     const addDesk = useCallback(() => {
+        const visibleDesks = editorDesks.filter(desk => desk.status !== 'deleted');
+        const newDeskNumber = visibleDesks.length + 1;
+
         const newDesk: EditorDesk = {
             clientId: nextClientId,
             office_id: floor.office_id,
-            desk_number: editorDesks.length + 1,
-            location_description: `Desk ${editorDesks.length + 1}`,
+            desk_number: newDeskNumber,
+            location_description: `Desk ${newDeskNumber}`,
             x_position: 0.1, // 10% from left edge
             y_position: 0.1, // 10% from top edge
             is_active: true,
             status: 'new'
         };
 
-        setEditorDesks(prev => [...prev, newDesk]);
-        setNextClientId(prev => prev + 1);
-    }, [nextClientId, editorDesks.length, floor.office_id]);
+        const newDesks = [...editorDesks, newDesk];
+        const newNextClientId = nextClientId + 1;
+
+        setEditorDesks(newDesks);
+        setNextClientId(newNextClientId);
+
+        // Save to history
+        saveToHistory(newDesks, newNextClientId);
+    }, [nextClientId, editorDesks, floor.office_id, saveToHistory]);
+
+    // Recalculate desk numbers to ensure sequential numbering
+    const recalculateDeskNumbers = useCallback((desks: EditorDesk[]) => {
+        const visibleDesks = desks.filter(desk => desk.status !== 'deleted');
+        return desks.map(desk => {
+            if (desk.status === 'deleted') return desk;
+
+            // Find the position of this desk among visible desks
+            const visibleIndex = visibleDesks.findIndex(d => d.clientId === desk.clientId);
+            const newDeskNumber = visibleIndex + 1;
+
+            if (desk.desk_number !== newDeskNumber) {
+                return {
+                    ...desk,
+                    desk_number: newDeskNumber,
+                    location_description: `Desk ${newDeskNumber}`,
+                    // Don't change status - renumbering is not a user modification
+                };
+            }
+            return desk;
+        });
+    }, []);
 
     // Delete a desk
     const deleteDesk = useCallback((clientId: number) => {
-        setEditorDesks(prev => prev.map(desk =>
-            desk.clientId === clientId
-                ? { ...desk, status: 'deleted' as const }
-                : desk
-        ));
+        const deskToDelete = editorDesks.find(desk => desk.clientId === clientId);
+
+        let newDesks: EditorDesk[];
+
+        if (deskToDelete?.status === 'new') {
+            // If it's a new desk, simply remove it from the list
+            newDesks = editorDesks.filter(desk => desk.clientId !== clientId);
+        } else {
+            // If it's an existing desk (initial/updated), mark it as deleted
+            newDesks = editorDesks.map(desk =>
+                desk.clientId === clientId
+                    ? { ...desk, status: 'deleted' as const }
+                    : desk
+            );
+        }
+
+        // Recalculate desk numbers after deletion
+        newDesks = recalculateDeskNumbers(newDesks);
+
+        setEditorDesks(newDesks);
         setSelectedDeskId(null);
-    }, []);
+
+        // Save to history
+        saveToHistory(newDesks, nextClientId);
+    }, [editorDesks, nextClientId, saveToHistory, recalculateDeskNumbers]);
 
     const handleMouseDown = useCallback((e: React.MouseEvent, desk: EditorDesk) => {
         e.preventDefault();
@@ -137,30 +286,91 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
         ));
     }, [isDragging, selectedDeskId, dragOffset, floorPlanDimensions, absoluteToRelative]);
 
-    // Handle mouse up (stop dragging)
+    // Handle mouse up (stop dragging and save to history)
     const handleMouseUp = useCallback(() => {
+        if (isDragging && selectedDeskId !== null) {
+            // Save the final position to history
+            saveToHistory(editorDesks, nextClientId);
+        }
+
         setIsDragging(false);
         setSelectedDeskId(null);
-    }, []);
+    }, [isDragging, selectedDeskId, editorDesks, nextClientId, saveToHistory]);
 
     // Handle save
     const handleSave = useCallback(() => {
-        const desksToSave = editorDesks.filter(desk => desk.status !== 'deleted');
-        console.log('Saving desks:', desksToSave);
-        // Here you would call your Laravel API
-        alert(`Would save ${desksToSave.length} desks to the server`);
-    }, [editorDesks]);
+        // Only desks with 'initial', 'updated', or 'deleted' status need to be processed
+        // 'new' desks that aren't deleted are included, 'new' desks that were removed are ignored
+        const desksToSave = editorDesks.filter(desk => desk.status === 'new');
+        const desksToEdit = editorDesks.filter(desk => desk.status === "updated");
+        const desksToDelete = editorDesks.filter(desk => desk.status === 'deleted');
 
-    // Get visible desks (not deleted)
+        // Prepare data for backend
+        const submitData = {
+            "desks_to_create": desksToSave.map(desk => ({
+                "floor_id": floor.id,
+                "desk_number": desk.desk_number.toString(),
+                "x_position": desk.x_position,
+                "y_position": desk.y_position,
+            })),
+            "desks_to_edit": desksToEdit.map(desk => ({
+                "id": desk.id,
+                "floor_id": floor.id,
+                "desk_number": desk.desk_number.toString(),
+                "x_position": desk.x_position,
+                "y_position": desk.y_position,
+            })),
+            "desks_to_delete": desksToDelete.map(desk => desk.id).filter(Boolean),
+            "office_id":  office.id,
+            "floor_id": floor.id
+        }
+
+        router.post(route("desk.storeMultiple"), submitData, {
+            onError: (error) => {
+                console.log(error);
+            },
+            onSuccess: () => {
+                setEditorDesks(prev => prev
+                    .filter(desk => desk.status !== 'deleted')
+                    .map(desk => ({ ...desk, status: 'initial' }))
+                );
+            }
+        })
+    }, [editorDesks, floor.id]);
+
     const visibleDesks = editorDesks.filter(desk => desk.status !== 'deleted');
 
+    // Check if undo/redo are available
+    const canUndo = historyIndex > 0;
+    const canRedo = historyIndex < history.length - 1;
+
     return (
-        <div className="h-screen bg-gray-50 flex flex-col">
+        <div className="h-auto bg-background flex flex-col">
             {/* Header */}
             <div className="bg-background border-b px-4 pb-4 ">
                 <div className="flex justify-between items-center">
                     <h1 className={"text-lg font-extrabold"}>Desk orientation</h1>
                     <div className="flex gap-3">
+                        <div className="flex gap-1">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={undo}
+                                disabled={!canUndo}
+                                title="Undo (Ctrl+Z)"
+                            >
+                                <Undo size={16}/>
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={redo}
+                                disabled={!canRedo}
+                                title="Redo (Ctrl+Shift+Z)"
+                            >
+                                <Redo size={16}/>
+                            </Button>
+                        </div>
                         <Button onClick={addDesk}>
                             <Plus size={16}/>
                             Add Desk
@@ -174,9 +384,8 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-1 overflow-hidden">
-                {/* Floor Plan Area (70%) */}
-                <div className="flex-1 relative bg-white border-r overflow-auto" style={{ width: '70%' }}>
+            <div className="grid grid-cols-3">
+                <div className="border-r bg-background h-full pr-2 col-span-2 w-full">
                     <div
                         ref={floorPlanRef}
                         className="relative inline-block min-w-full min-h-full"
@@ -184,12 +393,11 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
                         onMouseUp={handleMouseUp}
                         onMouseLeave={handleMouseUp}
                     >
-                        {/* Floor Plan Image */}
                         <img
                             ref={imageRef}
                             src={getFileUrl(floor.plan_image)}
                             alt={floor.name}
-                            className="max-w-none"
+                            className="max-w-full h-full object-contain"
                             onLoad={handleImageLoad}
                             draggable={false}
                         />
@@ -221,15 +429,16 @@ const FloorPlanEditor: React.FC<ComponentProps> = (props) => {
                         })}
                     </div>
                 </div>
-
-                {/* Desk List (30%) */}
-                <div className="bg-white" style={{ width: '30%' }}>
+                <div className="bg-background w-full h-full col-span-1" >
                     <div className="p-4 border-b">
                         <h2 className="text-lg font-semibold text-gray-900">Desks</h2>
                         <p className="text-sm text-gray-600">{visibleDesks.length} total desks</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                            History: {historyIndex + 1}/{history.length}
+                        </p>
                     </div>
 
-                    <div className="overflow-y-auto h-full pb-20">
+                    <div className="h-auto overflow-y-scroll max-h-[500px]">
                         {visibleDesks.length === 0 ? (
                             <div className="p-4 text-center text-gray-500">
                                 No desks yet. Click "Add Desk" to get started.

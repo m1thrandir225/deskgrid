@@ -64,6 +64,7 @@ class FloorController extends Controller
     public function show(Office $office, Floor $floor): Response
     {
         Gate::authorize('view', $floor);
+        $floor->load('desks');
 
         $floor->plan_image_url = asset(Storage::url($floor->plan_image));
 
@@ -77,25 +78,31 @@ class FloorController extends Controller
     {
         Gate::authorize('update', $floor);
 
+        $floor["plan_image_url"] = Storage::url($floor["plan_image"]);
+
         return Inertia::render('offices/floors/edit', [
             "office" => $office,
             "floor" => $floor,
-            "floor_plan_url" => Storage::url($floor["plan_image"])
         ]);
     }
 
-    public function update(UpdateFloorRequest $request, Floor $floor): RedirectResponse
+    public function update(UpdateFloorRequest $request, Office $office ,Floor $floor): RedirectResponse
     {
-        Gate::authorize('update', $floor);
-
+        //Gate::authorize('update', $floor);
         $validated = $request->validated();
-
-        $floor->update([
+        $dataToUpdate = [
             'name' => $validated['name'],
-            'plan_image' => $validated['plan_image']
-        ]);
+        ];
 
-        return to_route('floors.show', $floor->id);
+        if($request->hasFile("plan_image")) {
+            Storage::delete($floor->plan_image);
+            $filePath = $request->file('plan_image')->store('floor_plans');
+            $dataToUpdate["plan_image"] = $filePath;
+        }
+
+        $floor->update($dataToUpdate);
+
+        return to_route('offices.floors.show', [$office->id, $floor->id]);
     }
 
     public function destroy(Office $office, Floor $floor): RedirectResponse

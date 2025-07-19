@@ -21,7 +21,7 @@ class DeskPolicy
      */
     public function view(User $user, Desk $desk): bool
     {
-        $employer_id = $desk->floor()->office()->employer()->id;
+        $employer_id = $desk->floor->office->employer->id;
         return $user->id === $employer_id;
     }
 
@@ -31,7 +31,7 @@ class DeskPolicy
     public function create(User $user): bool
     {
 
-        return $user->role() === UserRole::Admin;
+        return $user->role === UserRole::Admin;
     }
 
     /**
@@ -39,7 +39,7 @@ class DeskPolicy
      */
     public function update(User $user, Desk $desk): bool
     {
-        $employer_id = $desk->floor()->office()->employer()->id;
+        $employer_id = $desk->floor->office->employer->id;
         return $user->id === $employer_id;
     }
 
@@ -48,7 +48,7 @@ class DeskPolicy
      */
     public function delete(User $user, Desk $desk): bool
     {
-        $employer_id = $desk->floor()->office()->employer()->id;
+        $employer_id = $desk->floor->office->employer->id;
         return $user->id === $employer_id;
 
     }

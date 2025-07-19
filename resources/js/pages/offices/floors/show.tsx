@@ -7,6 +7,7 @@ import { Office } from '@/types/office';
 import { Link, useForm } from '@inertiajs/react';
 import { Edit2, Trash } from 'lucide-react';
 import { FormEventHandler, useMemo } from 'react';
+import FloorPlanEditor from '@/components/floor/plan-editor/plan-editor';
 
 interface PageProps {
     floor: Floor;
@@ -52,13 +53,13 @@ const FloorDetailsPage: React.FC<PageProps> = (props) => {
                         <Edit2 size={24} />
                     </Link>
                 </Button>
-
                 <form onSubmit={onSubmit}>
                     <Button type="submit" variant="destructive" size="icon" disabled={processing}>
                         <Trash size={24} />
                     </Button>
                 </form>
             </OfficeLayoutHeader>
+            <FloorPlanEditor office={office} floor={floor} />
         </OfficesLayout>
     );
 };

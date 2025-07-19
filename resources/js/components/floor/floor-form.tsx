@@ -9,6 +9,7 @@ export interface FloorFormProps {
     nameValue: string;
     setName: (value: string) => void;
     nameErrors?: string;
+    planImageUrl: string | null;
     planImageValue: File | null;
     setPlanImage: (value: File) => void;
     planImageErrors?: string;
@@ -18,12 +19,17 @@ export interface FloorFormProps {
 }
 
 const FloorForm: React.FC<FloorFormProps> = (props) => {
-    const { nameValue, setName, nameErrors, planImageValue, setPlanImage, planImageErrors, isLoading, onSubmit, officeId } = props;
+    const { nameValue, setName, nameErrors, planImageValue, setPlanImage, planImageErrors, isLoading, onSubmit, officeId, planImageUrl } = props;
 
-    const planImageUrl = useMemo(() => {
-        if (!planImageValue) return null;
+    const localPlanImageUrl = useMemo(() => {
+        if(!planImageValue) {
+            if(!planImageUrl) {
+                return null;
+            }
+            return planImageUrl;
+        }
         return URL.createObjectURL(planImageValue);
-    }, [planImageValue]);
+    }, [planImageValue, planImageUrl])
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -53,7 +59,7 @@ const FloorForm: React.FC<FloorFormProps> = (props) => {
                     name="plan_image"
                     type="file"
                     accept="image/png, image/jpeg, image/webp"
-                    required
+                    required={!planImageUrl}
                     onChange={handleFileChange}
                     disabled={isLoading}
                     placeholder="Upload"
@@ -61,10 +67,10 @@ const FloorForm: React.FC<FloorFormProps> = (props) => {
                 <InputError message={planImageErrors} />
             </div>
             <input type="hidden" name="office_id" value={officeId} />
-            {planImageUrl && <img src={planImageUrl} className="h-[200px] w-full rounded-md object-cover" />}
+            {localPlanImageUrl && <img src={localPlanImageUrl} className="h-[200px] w-full rounded-md object-contain"  alt={"plan_image"}/>}
             <Button type="submit" tabIndex={5} className="w-full self-center" disabled={isLoading}>
                 {isLoading && <LoaderCircle className="h- 4 w-4 animate-spin" />}
-                Create
+                {planImageUrl ? 'Update' : 'Create'}
             </Button>
         </form>
     );

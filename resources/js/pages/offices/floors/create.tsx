@@ -43,8 +43,6 @@ const CreateFloorPage: React.FC<PageProps> = (props) => {
     });
 
     const handleSubmit: FormEventHandler = (e) => {
-        console.log(e);
-        console.log(data);
         e.preventDefault();
 
         if (!data.plan_image) {
@@ -69,6 +67,7 @@ const CreateFloorPage: React.FC<PageProps> = (props) => {
         isLoading: processing,
         onSubmit: handleSubmit,
         officeId: office.id,
+        planImageUrl: null
     };
     return (
         <OfficesLayout title={'Create a floor'} breadcrumbs={breadcrumbs}>

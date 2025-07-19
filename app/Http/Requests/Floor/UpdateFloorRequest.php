@@ -6,6 +6,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateFloorRequest extends FormRequest
 {
+    public function authorize(): bool {
+        return true;
+    }
     /**
      * Get the validation rules that apply to the request.
      *
@@ -15,7 +18,13 @@ class UpdateFloorRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'plan_image' => 'image|size:51200' //50MB
+            'plan_image' => [
+                "sometimes",
+                "nullable",
+                "image",
+                "mimes:png,jpeg,jpg,webp",
+                "max:10240"
+            ]
         ];
     }
 }
