@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -38,6 +39,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'has_set_password'
+    ];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -60,5 +65,12 @@ class User extends Authenticatable
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    protected function hasSetPassword(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->password !== null,
+        );
     }
 }
