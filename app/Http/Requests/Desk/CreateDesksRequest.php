@@ -21,6 +21,7 @@ class CreateDesksRequest extends FormRequest
             "desks_to_create" => "nullable|array",
             'desks_to_create.*.floor_id' => 'required|exists:floors,id',
             'desks_to_create.*.desk_number' => 'required|string|max:255',
+            "desks_to_create.*.location_description" => 'string|nullable|max:255',
             'desks_to_create.*.x_position' => 'required|numeric',
             'desks_to_create.*.y_position' => 'required|numeric',
 
@@ -28,6 +29,7 @@ class CreateDesksRequest extends FormRequest
             'desks_to_edit.*.id' => 'required|exists:desks,id',
             'desks_to_edit.*.floor_id' => 'required|exists:floors,id',
             'desks_to_edit.*.desk_number' => 'required|string|max:255',
+            "desks_to_edit.*.location_description" => 'string|nullable|max:255',
             'desks_to_edit.*.x_position' => 'required|numeric',
             'desks_to_edit.*.y_position' => 'required|numeric',
 

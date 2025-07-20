@@ -27,6 +27,8 @@ export interface FloorPlanEditorContext {
     saveChanges: () => void;
     relativeToAbsolute: (relativeX: number, relativeY: number) => {x: number, y: number};
     historyIndex: number;
+    updateDeskLocationDescription: (newDescription: string) => void;
+    hasChanges: boolean;
 }
 
 const FloorPlanEditorContext = createContext<FloorPlanEditorContext | null>(null)

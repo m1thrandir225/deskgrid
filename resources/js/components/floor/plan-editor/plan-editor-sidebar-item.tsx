@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { EditorDesk } from '@/types/desk';
-import { Move, Trash, Trash2 } from 'lucide-react';
+import { Move, Trash } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface ComponentProps {
     desk: EditorDesk;
     selectDesk: () => void;
+    updateDeskLocationDescription: (value: string) => void;
     deleteDesk: () => void;
     isSelected: boolean;
 }
 
-const PlanEditorDeskListItem: React.FC<ComponentProps> = (props) => {
-    const { desk, selectDesk, deleteDesk, isSelected } = props;
+const PlanEditorSidebarItem: React.FC<ComponentProps> = (props) => {
+    const { desk, selectDesk, deleteDesk, isSelected, updateDeskLocationDescription } = props;
+
+    const [locationDescription, setLocationDescription] = useState<string>(desk.location_description)
+
+    const handleUpdateLocationDescription = useCallback((newValue: string) => {
+        setLocationDescription(newValue);
+        updateDeskLocationDescription(newValue);
+    }, [updateDeskLocationDescription])
     return (
         <div
             key={desk.clientId}
@@ -22,7 +31,7 @@ const PlanEditorDeskListItem: React.FC<ComponentProps> = (props) => {
             onClick={selectDesk}
         >
             <div className="flex justify-between items-start">
-                <div className="flex-1">
+                <div className="flex-1 gap-2 flex flex-col w-full">
                     <div className="flex items-center gap-2">
                         <span className="font-medium text-gray-900">Desk {desk.desk_number}</span>
                         {desk.status === 'new' && (
@@ -35,6 +44,13 @@ const PlanEditorDeskListItem: React.FC<ComponentProps> = (props) => {
                     <p className="text-sm text-gray-600 mt-1">
                         Position: ({(desk.x_position * 100).toFixed(1)}%, {(desk.y_position * 100).toFixed(1)}%)
                     </p>
+                    <Input
+                        type={"text"}
+                        placeholder={"Location description"}
+                        className={"w-full"}
+                        value={locationDescription}
+                        onChange={(e) => handleUpdateLocationDescription(e.target.value)}
+                    />
                 </div>
                 <div className="flex items-center gap-1">
                     <Move size={16} className="text-gray-400" />
@@ -53,4 +69,4 @@ const PlanEditorDeskListItem: React.FC<ComponentProps> = (props) => {
     )
 }
 
-export default PlanEditorDeskListItem;
+export default PlanEditorSidebarItem;

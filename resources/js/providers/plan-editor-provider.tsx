@@ -2,8 +2,13 @@ import { Office } from '@/types/office';
 import { Floor } from '@/types/floor';
 import FloorPlanEditorContext from '@/contexts/plan-editor-context';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { EditorDesk } from '@/types/desk';
+import { Desk, EditorDesk } from '@/types/desk';
 import { router } from '@inertiajs/react';
+
+interface PageProps {
+    floor: Floor,
+    office: Office
+}
 
 interface HistoryState {
     desks: EditorDesk[];
@@ -28,7 +33,11 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
     const floorPlanRef = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLImageElement>(null);
 
-    // Initialize desks and create initial history state
+    const visibleDesks = useMemo(() => {
+        return editorDesks.filter(desk => desk.status !== "deleted")
+    }, [editorDesks])
+
+
     useEffect(() => {
         if (floor.desks) {
             const initialDesks: EditorDesk[] = floor.desks.map(desk => ({
@@ -50,9 +59,8 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
             setHistory([initialState]);
             setHistoryIndex(0);
         }
-    }, []);
+    }, [floor]);
 
-    // Save state to history (but not when updating from history)
     const saveToHistory = useCallback((desks: EditorDesk[], nextId: number) => {
         if (isUpdatingFromHistory) return;
 
@@ -62,11 +70,9 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         };
 
         setHistory(prev => {
-            // Remove any future history if we're not at the end
             const newHistory = prev.slice(0, historyIndex + 1);
             newHistory.push(newState);
 
-            // Limit history size to 50 states
             if (newHistory.length > 50) {
                 newHistory.shift();
                 return newHistory;
@@ -292,6 +298,8 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         setSelectedDeskId(null);
     }, [isDragging, selectedDeskId, editorDesks, nextClientId, saveToHistory]);
 
+
+
     // Handle save
     const handleSave = useCallback(() => {
         // Only desks with 'initial', 'updated', or 'deleted' status need to be processed
@@ -305,6 +313,7 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
             "desks_to_create": desksToSave.map(desk => ({
                 "floor_id": floor.id,
                 "desk_number": desk.desk_number.toString(),
+                "location_description": desk.location_description,
                 "x_position": desk.x_position,
                 "y_position": desk.y_position,
             })),
@@ -312,6 +321,7 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
                 "id": desk.id,
                 "floor_id": floor.id,
                 "desk_number": desk.desk_number.toString(),
+                "location_description": desk.location_description,
                 "x_position": desk.x_position,
                 "y_position": desk.y_position,
             })),
@@ -321,19 +331,41 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         }
 
         router.post(route("desk.storeMultiple"), submitData, {
+            preserveState: true,
+            preserveScroll: true,
             onError: (error) => {
                 console.log(error);
             },
-            onSuccess: () => {
-                setEditorDesks(prev => prev
-                    .filter(desk => desk.status !== 'deleted')
-                    .map(desk => ({ ...desk, status: 'initial' }))
-                );
+            onSuccess: (page) => {
             }
         })
     }, [editorDesks, floor.id]);
 
-    const visibleDesks = editorDesks.filter(desk => desk.status !== 'deleted');
+    const updateDeskLocationDescription = useCallback((locationDescription: string) => {
+        if(!selectedDeskId) return;
+
+        const desk = visibleDesks.find(desk => desk.clientId === selectedDeskId);
+        if(!desk) return;
+
+        desk.location_description = locationDescription;
+
+
+        setEditorDesks(prev => prev.map(desk =>
+            desk.clientId === selectedDeskId
+                ? {
+                    ...desk,
+                    location_description: locationDescription,
+                    status: desk.status === 'initial' ? 'updated' : desk.status
+                }
+                : desk
+        ));
+
+
+    }, [selectedDeskId, visibleDesks]);
+
+    const hasChanges = useMemo(() => {
+        return editorDesks.some(desk => desk.status !== 'initial')
+    }, [editorDesks]);
 
     // Check if undo/redo are available
     const canUndo = useMemo(() => {
@@ -369,11 +401,13 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         relativeToAbsolute,
         isDragging,
         historyIndex,
+        updateDeskLocationDescription,
+        hasChanges
     }
 
 }
 
-export const FloorPlanEditorProvider: React.FC<{ children: React.ReactNode, office: Office, floor: Floor }> = (props) => {
+export const PlanEditorProvider: React.FC<{ children: React.ReactNode, office: Office, floor: Floor }> = (props) => {
     const { children, floor, office} = props;
 
     const value = useFloorPlanEditorState({ floor, office });

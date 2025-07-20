@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFloorPlanEditorContext } from '@/contexts/plan-editor-context';
-import PlanEditorDeskListItem from '@/components/floor/plan-editor/plan-editor-desk-list-item';
+import PlanEditorSidebarItem from '@/components/floor/plan-editor/plan-editor-sidebar-item';
 
 const FloorPlanEditorSidebar: React.FC = () => {
     const {
@@ -8,7 +8,9 @@ const FloorPlanEditorSidebar: React.FC = () => {
         selectDesk,
         deleteDesk,
         selectedDeskId,
-        historyIndex
+        historyIndex,
+        updateDeskLocationDescription,
+        historyState
     } = useFloorPlanEditorContext();
     return (
         <div className="bg-background w-full h-full col-span-1" >
@@ -16,7 +18,7 @@ const FloorPlanEditorSidebar: React.FC = () => {
                 <h2 className="text-lg font-semibold text-gray-900">Desks</h2>
                 <p className="text-sm text-gray-600">{visibleDesks.length} total desks</p>
                 <p className="text-xs text-gray-500 mt-1">
-                    History: {historyIndex + 1}/{history.length}
+                    History: {historyIndex + 1}/{historyState.total}
                 </p>
             </div>
 
@@ -28,12 +30,13 @@ const FloorPlanEditorSidebar: React.FC = () => {
                 ) : (
                     <div className="space-y-2 p-4">
                         {visibleDesks.map(desk => (
-                            <PlanEditorDeskListItem
+                            <PlanEditorSidebarItem
                                 key={desk.clientId}
                                 desk={desk}
                                 selectDesk={() => selectDesk(desk.clientId)}
                                 deleteDesk={() => deleteDesk(desk.clientId)}
                                 isSelected={selectedDeskId === desk.clientId}
+                                updateDeskLocationDescription={(newValue: string) => updateDeskLocationDescription(newValue)}
                             />
                         ))}
                     </div>

@@ -39,8 +39,6 @@ class DeskController extends Controller
 
         $validated = $request->validated();
 
-
-
         Desk::create([
             'floor_id' => $validated['floor_id'],
             'desk_number' => $validated['desk_number'],
