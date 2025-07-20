@@ -1,15 +1,20 @@
 import React, { createContext, useContext} from 'react';
 import { EditorDesk } from '@/types/desk';
+import { Floor } from '@/types/floor';
+import { Office } from '@/types/office';
 
-interface FloorPlanEditorContext {
+export interface FloorPlanEditorContext {
+    floor: Floor,
+    office: Office,
     editorDesks:  EditorDesk[]
     visibleDesks:   EditorDesk[]
-    selectDeskId: number | null;
+    selectedDeskId: number | null;
     canUndo: boolean;
     canRedo: boolean;
+    isDragging: boolean;
     historyState: { current: number; total: number};
     floorPlanRef: React.RefObject<HTMLDivElement | null>;
-    imageRef: React.RefObject<HTMLDivElement | null>;
+    imageRef: React.RefObject<HTMLImageElement | null>;
     handleImageLoad: () => void;
     handleMouseDown: (e: React.MouseEvent, desk: EditorDesk) => void;
     handleMouseMove: (e: React.MouseEvent) => void;
@@ -20,6 +25,8 @@ interface FloorPlanEditorContext {
     undo: () => void;
     redo: () => void;
     saveChanges: () => void;
+    relativeToAbsolute: (relativeX: number, relativeY: number) => {x: number, y: number};
+    historyIndex: number;
 }
 
 const FloorPlanEditorContext = createContext<FloorPlanEditorContext | null>(null)

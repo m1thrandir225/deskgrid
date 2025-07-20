@@ -1,7 +1,7 @@
 import { Office } from '@/types/office';
 import { Floor } from '@/types/floor';
 import FloorPlanEditorContext from '@/contexts/plan-editor-context';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EditorDesk } from '@/types/desk';
 import { router } from '@inertiajs/react';
 
@@ -25,8 +25,8 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
     const [historyIndex, setHistoryIndex] = useState(-1);
     const [isUpdatingFromHistory, setIsUpdatingFromHistory] = useState(false);
 
-    const floorPlanRef = useRef<HTMLDivElement | null>(null);
-    const imageRef = useRef<HTMLImageElement | null>(null);
+    const floorPlanRef = useRef<HTMLDivElement>(null);
+    const imageRef = useRef<HTMLImageElement>(null);
 
     // Initialize desks and create initial history state
     useEffect(() => {
@@ -336,13 +336,17 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
     const visibleDesks = editorDesks.filter(desk => desk.status !== 'deleted');
 
     // Check if undo/redo are available
-    const canUndo = historyIndex > 0;
-    const canRedo = historyIndex < history.length - 1;
+    const canUndo = useMemo(() => {
+        return historyIndex > 0;
+    }, [historyIndex]);
+
+    const canRedo = useMemo(() => {
+        return historyIndex < history.length - 1;
+    }, [history, historyIndex]);
 
     return {
         editorDesks,
         visibleDesks,
-        selectedDeskId,
         setSelectedDeskId,
         canUndo,
         canRedo,
@@ -350,6 +354,8 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         floorPlanRef,
         imageRef,
         handleImageLoad,
+        office,
+        floor,
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
@@ -357,9 +363,12 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         deleteDesk,
         undo,
         redo,
-        selectDeskId: selectedDeskId,
+        selectedDeskId,
         selectDesk: (clientId: number | null) => setSelectedDeskId(clientId),
         saveChanges: handleSave,
+        relativeToAbsolute,
+        isDragging,
+        historyIndex,
     }
 
 }

@@ -1,9 +1,21 @@
 import React from 'react';
 import { useFloorPlanEditorContext } from '@/contexts/plan-editor-context';
-import PlanEditorDeskListItem from '@/components/floor/plan-editor/plan-editor-desk-list-item';
 
 const FloorPlanEditorCanvas: React.FC = () => {
-    const { floorPlanRef, handleImageLoad, imageRef, handleMouseUp, handleMouseMove, handleMouseDown, visibleDesks} = useFloorPlanEditorContext();
+    const {
+        floor,
+        floorPlanRef,
+        relativeToAbsolute,
+        handleImageLoad,
+        imageRef,
+        handleMouseUp,
+        handleMouseMove,
+        handleMouseDown,
+        visibleDesks,
+        selectedDeskId,
+        isDragging,
+
+    } = useFloorPlanEditorContext();
     return (
         <div className="border-r bg-background h-full pr-2 col-span-2 w-full">
             <div
@@ -15,7 +27,7 @@ const FloorPlanEditorCanvas: React.FC = () => {
             >
                 <img
                     ref={imageRef}
-                    src={getFileUrl(floor.plan_image)}
+                    src={floor.plan_image_url}
                     alt={floor.name}
                     className="max-w-full h-full object-contain"
                     onLoad={handleImageLoad}
@@ -51,3 +63,5 @@ const FloorPlanEditorCanvas: React.FC = () => {
         </div>
     )
 }
+
+export default FloorPlanEditorCanvas;
