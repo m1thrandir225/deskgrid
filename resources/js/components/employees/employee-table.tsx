@@ -4,7 +4,8 @@ import { Employee } from '@/types/employee';
 import { Button } from '@/components/ui/button';
 import { Check, Edit2, Mail, Shield, ShieldBan, Trash, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { router } from "@inertiajs/react"
+import { Link, router, usePage } from '@inertiajs/react';
+import { SharedData } from '@/types';
 
 interface ComponentProps {
     employees: Employee[];
@@ -13,10 +14,18 @@ interface ComponentProps {
 const EmployeeTable: React.FC<ComponentProps> = (props) => {
     const { employees } = props;
 
+    const { auth  } = usePage<SharedData>().props
+
 
     const handleResendInvitation = (employeeId: number) => {
-        router.post(route("employees.resend", { user: employeeId }), {}, {
+        router.post(route("employees.resend", { employee: employeeId }), {}, {
             preserveScroll: true
+        } )
+    }
+
+    const handleDelete = (employeeId: number) => {
+        router.delete(route("employees.destroy", { employee: employeeId }), {
+            preserveScroll: true,
         } )
     }
 
@@ -64,23 +73,27 @@ const EmployeeTable: React.FC<ComponentProps> = (props) => {
                             )}
                         </TableCell>
                         <TableCell className="flex flex-row gap-2">
-                            {item.has_set_password ? (
-                                <>
-                                    <Button variant={'outline'} size={'sm'}>
+                            {auth.user.id === item.id ? (
+                                <p className={"text-sm"}> No available actions for this employee. </p>
+                                ) : (
+                            <>
+                                <Button disabled={item.has_set_password} variant={"default"} size={"sm"} onClick={() => handleResendInvitation(item.id)}>
+                                    <Mail />
+                                    Resend
+                                </Button>
+                                <Button asChild variant={'outline'} size={'sm'}>
+                                    <Link href={`/employees/${item.id}/edit`}>
                                         <Edit2 />
                                         Edit
-                                    </Button>
-                                    <Button variant={'outline'} size={'sm'}>
-                                        <Trash />
-                                        Delete
-                                    </Button>
-                                </>
-                            ) : (
-                                <Button variant={"default"} size={"sm"} onClick={() => handleResendInvitation(item.id)}>
-                                    <Mail />
-                                    Resend Invitation
+                                    </Link>
                                 </Button>
+                                <Button disabled={auth.user.id === item.id} variant={'destructive'} size={'sm'} onClick={() => handleDelete(item.id)}>
+                                    <Trash />
+                                    Delete
+                                </Button>
+                            </>
                             )}
+
                         </TableCell>
                     </TableRow>
                 ))}

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { LoaderCircle } from 'lucide-react';
 
 export interface EmployeeFormProps {
+    mode: "Create" | "Edit"
     firstNameValue: string;
     lastNameValue: string;
     emailValue: string;
@@ -20,6 +21,7 @@ export interface EmployeeFormProps {
 
 const EmployeeForm: React.FC<EmployeeFormProps> = (props) => {
     const {
+        mode,
         firstNameValue,
         lastNameValue,
         emailValue,
@@ -73,7 +75,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = (props) => {
             </div>
             <Button type="submit" tabIndex={5} className="w-full self-center" disabled={isLoading}>
                 {isLoading && <LoaderCircle className="h- 4 w-4 animate-spin" />}
-                Create
+                {mode + " employee"}
             </Button>
         </form>
     )

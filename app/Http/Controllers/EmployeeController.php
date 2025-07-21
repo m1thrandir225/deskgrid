@@ -84,32 +84,33 @@ class EmployeeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(User $employee): Response
     {
-        //
+        return Inertia::render("employees/edit", [
+            "employee" => $employee
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEmployeeRequest $request, User $employee)
+    public function update(UpdateEmployeeRequest $request, User $employee): RedirectResponse
     {
         //
         $validated = $request->validated();
 
         $employee->update($validated);
 
-        return redirect("employees.index");
+        return to_route("employees.index")->with("message", "Successfully updated {$employee->name} employee.");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $employee)
+    public function destroy(User $employee): RedirectResponse
     {
         $employee->delete();
-        return redirect("employees.index");
-        //
+        return to_route("employees.index")->with("message", "Employee {$employee->name} deleted.");
     }
 
     /**
@@ -125,8 +126,6 @@ class EmployeeController extends Controller
      */
     public function storeMultiple(ImportEmployeesRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
         $file = $request->file("import_file");
         $path = $file->getRealPath();
 
@@ -165,7 +164,8 @@ class EmployeeController extends Controller
         return to_route("employees.index");
     }
 
-    public function resendInvitation(User $user) {
+    public function resendInvitation(User $user): RedirectResponse
+    {
         if($user->password != null) {
             return redirect()->back()->with("error", "This user has already set a password");
         }

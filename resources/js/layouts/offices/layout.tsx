@@ -14,7 +14,9 @@ const OfficesLayout: React.FC<Props> = (props) => {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={title} />
-            <div className="flex w-full flex-col gap-8 px-4 py-6">{children}</div>
+            <div className="flex w-full flex-col gap-8 px-4 py-6">
+                {children}
+            </div>
             <Toaster/>
         </AppLayout>
     );

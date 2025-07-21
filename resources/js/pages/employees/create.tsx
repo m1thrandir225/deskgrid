@@ -34,6 +34,7 @@ const EmployeeCreatePage: React.FC = () => {
 
             </OfficeLayoutHeader>
             <EmployeeForm
+                mode={"Create"}
                 firstNameValue={data.first_name}
                 lastNameValue={data.last_name}
                 emailValue={data.email}
