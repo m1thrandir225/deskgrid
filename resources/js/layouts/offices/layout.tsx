@@ -1,6 +1,7 @@
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import AppLayout from '../app-layout';
+import { Toaster } from '@/components/ui/sonner';
 
 interface Props {
     children?: React.ReactNode;
@@ -14,6 +15,7 @@ const OfficesLayout: React.FC<Props> = (props) => {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={title} />
             <div className="flex w-full flex-col gap-8 px-4 py-6">{children}</div>
+            <Toaster/>
         </AppLayout>
     );
 };

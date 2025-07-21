@@ -25,9 +25,7 @@ class EmployeeController extends Controller
     {
         //
         $employees = User::query()
-            ->where("role", '!=', UserRole::Admin)
             ->get();
-
 
         return Inertia::render("employees/index", [
             "employees" => $employees,
@@ -180,8 +178,6 @@ class EmployeeController extends Controller
 
         Mail::to($user->email)->send(new UserInvitationEmail($user, $passwordSetupUrl));
 
-        return to_route("employees.index", [
-            ""
-        ]);
+        return redirect()->back()->with("message", "Invitation resent to {$user->name}.");
     }
 }
