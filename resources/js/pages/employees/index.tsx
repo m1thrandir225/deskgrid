@@ -3,7 +3,7 @@ import OfficesLayout from '@/layouts/offices/layout';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
 import { Link } from '@inertiajs/react';
-import { PlusIcon } from 'lucide-react';
+import { Import, PlusIcon } from 'lucide-react';
 import { Employee } from '@/types/employee';
 import EmployeeTable from '@/components/employees/employee-table';
 import { toast } from 'sonner';
@@ -28,9 +28,16 @@ const EmployeesPage: React.FC<PageProps> = (props) => {
     return (
         <OfficesLayout title={"Employees"} breadcrumbs={[]}>
             <OfficeLayoutHeader title={"Employees"} description={"Manage your organizations employees"}>
-                <Button asChild size={"icon"} variant={"outline"}>
+                <Button asChild variant={"outline"}>
                     <Link href={"/employees/create"}>
                         <PlusIcon size={24}/>
+                        Invite Employee
+                    </Link>
+                </Button>
+                <Button asChild variant={"outline"}>
+                    <Link href={"/employees/import"}>
+                        <Import />
+                        Import Employees
                     </Link>
                 </Button>
         </OfficeLayoutHeader>
