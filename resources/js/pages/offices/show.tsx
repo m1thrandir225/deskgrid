@@ -1,7 +1,7 @@
 import FloorTable from '@/components/floor/floor-table';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
-import OfficesLayout from '@/layouts/offices/layout';
+import AdminLayout from '@/layouts/admin/layout';
 import type { Office } from '@/types/office';
 import { Link, useForm } from '@inertiajs/react';
 import { Edit2, Plus, TrashIcon } from 'lucide-react';
@@ -35,7 +35,7 @@ const OfficeShowPage: React.FC<PageProps> = (props) => {
         destroy(route('offices.destroy', office.id));
     };
     return (
-        <OfficesLayout title={`${office.name} Details`} breadcrumbs={breadcrumbs}>
+        <AdminLayout title={`${office.name} Details`} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={office.name} description={office.address}>
                 <Button asChild size={'icon'} variant={'outline'}>
                     <Link href={`/offices/${office.id}/edit`}>
@@ -59,7 +59,7 @@ const OfficeShowPage: React.FC<PageProps> = (props) => {
                 </div>
                 {floors && <FloorTable items={floors} officeId={office.id} />}
             </div>
-        </OfficesLayout>
+        </AdminLayout>
     );
 };
 

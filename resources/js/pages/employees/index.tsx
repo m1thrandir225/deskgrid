@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import OfficesLayout from '@/layouts/offices/layout';
+import React, { useEffect, useMemo } from 'react';
+import AdminLayout from '@/layouts/admin/layout';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
 import { Link } from '@inertiajs/react';
@@ -8,6 +8,7 @@ import { Employee } from '@/types/employee';
 import EmployeeTable from '@/components/employees/employee-table';
 import { toast } from 'sonner';
 import { FlashMessage } from '@/types/page';
+import { BreadcrumbItem } from '@/types';
 
 interface PageProps {
     employees: Employee[];
@@ -16,6 +17,15 @@ interface PageProps {
 
 const EmployeesPage: React.FC<PageProps> = (props) => {
     const { employees, flash} = props;
+
+    const breadcrumbs = useMemo(() => {
+        return [
+            {
+                title: "Employees",
+                href: "/employees"
+            }
+        ] as BreadcrumbItem[];
+    }, [])
 
     useEffect(() => {
         if(flash.message) {
@@ -26,7 +36,7 @@ const EmployeesPage: React.FC<PageProps> = (props) => {
         }
     }, [flash])
     return (
-        <OfficesLayout title={"Employees"} breadcrumbs={[]}>
+        <AdminLayout title={"Employees"} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={"Employees"} description={"Manage your organizations employees"}>
                 <Button asChild variant={"outline"}>
                     <Link href={"/employees/create"}>
@@ -42,7 +52,7 @@ const EmployeesPage: React.FC<PageProps> = (props) => {
                 </Button>
         </OfficeLayoutHeader>
             <EmployeeTable employees={employees} />
-        </OfficesLayout>
+        </AdminLayout>
     )
 }
 

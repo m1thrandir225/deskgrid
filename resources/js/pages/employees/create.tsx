@@ -1,8 +1,9 @@
-import OfficesLayout from '@/layouts/offices/layout';
+import AdminLayout from '@/layouts/admin/layout';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
-import React, { FormEventHandler } from 'react';
+import React, { FormEventHandler, useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import EmployeeForm from '@/components/employees/employee-form';
+import { BreadcrumbItem } from '@/types';
 
 export type CreateEmployeeForm = {
     first_name: string;
@@ -11,16 +12,26 @@ export type CreateEmployeeForm = {
 }
 
 const EmployeeCreatePage: React.FC = () => {
-    const { data, transform, setData, post, errors, processing} = useForm<CreateEmployeeForm>({
+    const { data, setData, post, errors, processing} = useForm<CreateEmployeeForm>({
         first_name: '',
         last_name: '',
         email: '',
     });
+
+    const breadcrumbs = useMemo(() => {
+        return [
+            {
+                title: "Employees",
+                href: "/employees"
+            },
+            {
+                title: "Invite Employee",
+                href: "/employees/create"
+            }
+        ] as BreadcrumbItem[];
+    }, [])
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
-
-        console.log(data);
-
 
         post(route("employees.store"), {
             onError: (error) => {
@@ -29,8 +40,8 @@ const EmployeeCreatePage: React.FC = () => {
         })
     }
     return (
-        <OfficesLayout title={"Create Employee"}>
-            <OfficeLayoutHeader title={"Create a new Employee"} description={"Create a new employee for your organization"}>
+        <AdminLayout title={"Create Employee"} breadcrumbs={breadcrumbs}>
+            <OfficeLayoutHeader title={"Invite an Employee"} description={"Add a new employee for your organization"}>
 
             </OfficeLayoutHeader>
             <EmployeeForm
@@ -38,14 +49,12 @@ const EmployeeCreatePage: React.FC = () => {
                 firstNameValue={data.first_name}
                 lastNameValue={data.last_name}
                 emailValue={data.email}
-                emailErrors={errors.email}
-                firstNameErrors={errors.first_name}
-                lastNameErrors={errors.last_name}
+                errors={errors}
                 setInput={(newValue, field) => setData(field, newValue)}
                 isLoading={processing}
                 onSubmit={handleSubmit}
             />
-        </OfficesLayout>
+        </AdminLayout>
     )
 }
 

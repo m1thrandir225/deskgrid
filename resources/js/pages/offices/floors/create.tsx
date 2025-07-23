@@ -1,16 +1,16 @@
 import FloorForm, { FloorFormProps } from '@/components/floor/floor-form';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
-import OfficesLayout from '@/layouts/offices/layout';
+import AdminLayout from '@/layouts/admin/layout';
 import { BreadcrumbItem } from '@/types';
 import { Office } from '@/types/office';
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useMemo } from 'react';
+import React, { FormEventHandler, useMemo } from 'react';
 
 interface PageProps {
     office: Office;
 }
 
-type CreateFloorForm = {
+export type CreateFloorForm = {
     name: string;
     plan_image: File | null;
     office_id: number;
@@ -59,21 +59,19 @@ const CreateFloorPage: React.FC<PageProps> = (props) => {
 
     const formProps: FloorFormProps = {
         nameValue: data.name,
-        setName: (newVal) => setData('name', newVal),
-        nameErrors: errors.name,
         planImageValue: data.plan_image,
-        setPlanImage: (newVal) => setData('plan_image', newVal),
-        planImageErrors: errors.plan_image,
         isLoading: processing,
         onSubmit: handleSubmit,
-        officeId: office.id,
-        planImageUrl: null
+        officeIdValue: office.id,
+        planImageUrl: null,
+        errors: errors,
+        setInput: (newValue, field) => setData(field, newValue),
     };
     return (
-        <OfficesLayout title={'Create a floor'} breadcrumbs={breadcrumbs}>
+        <AdminLayout title={'Create a floor'} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title="Create a floor" description={`Create a floor for: ${office.name}`} />
             <FloorForm {...formProps} />
-        </OfficesLayout>
+        </AdminLayout>
     );
 };
 

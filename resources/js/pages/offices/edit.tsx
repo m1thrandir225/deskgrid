@@ -1,6 +1,6 @@
 import OfficeForm, { OfficeFormProps } from '@/components/office/office-form';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
-import OfficesLayout from '@/layouts/offices/layout';
+import AdminLayout from '@/layouts/admin/layout';
 import { Office } from '@/types/office';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useMemo } from 'react';
@@ -49,20 +49,18 @@ const UpdateOfficePage: React.FC<PageProps> = (props) => {
     };
     const formProps: OfficeFormProps = {
         nameValue: data.name,
-        setName: (newValue) => setData('name', newValue),
-        nameErrors: errors.name,
         addressValue: data.address,
-        setAddress: (newValue) => setData('address', newValue),
-        addressErrors: errors.address,
+        errors: errors,
+        setInput: (newValue, field) => setData(field, newValue),
         isLoading: processing,
         type: 'update',
         onSubmit: handleSubmit,
     };
     return (
-        <OfficesLayout title={`Editing ${office.name}`} breadcrumbs={breadcrumbs}>
+        <AdminLayout title={`Editing ${office.name}`} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={`Editing: ${office.name}`} description="Edit the selected officd information " />
             <OfficeForm {...formProps} />
-        </OfficesLayout>
+        </AdminLayout>
     );
 };
 

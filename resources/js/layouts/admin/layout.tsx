@@ -2,6 +2,7 @@ import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import AppLayout from '../app-layout';
 import { Toaster } from '@/components/ui/sonner';
+import React from 'react';
 
 interface Props {
     children?: React.ReactNode;
@@ -9,7 +10,7 @@ interface Props {
     title: string;
 }
 
-const OfficesLayout: React.FC<Props> = (props) => {
+const AdminLayout: React.FC<Props> = (props) => {
     const { children, breadcrumbs, title } = props;
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -22,4 +23,4 @@ const OfficesLayout: React.FC<Props> = (props) => {
     );
 };
 
-export default OfficesLayout;
+export default AdminLayout;

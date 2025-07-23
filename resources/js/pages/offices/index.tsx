@@ -1,7 +1,7 @@
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import OfficeListItem from '@/components/office/office-list-item';
 import { Button } from '@/components/ui/button';
-import OfficesLayout from '@/layouts/offices/layout';
+import AdminLayout from '@/layouts/admin/layout';
 import { BreadcrumbItem } from '@/types';
 import { type Office } from '@/types/office';
 import { Link } from '@inertiajs/react';
@@ -20,7 +20,7 @@ interface PageProps {
 
 export default function Index({ offices }: PageProps) {
     return (
-        <OfficesLayout title="Offices" breadcrumbs={breadcrumbs}>
+        <AdminLayout title="Offices" breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title="Offices" description="Manage your offices">
                 <Button asChild size={'icon'} variant={'outline'}>
                     <Link href="/offices/create">
@@ -33,6 +33,6 @@ export default function Index({ offices }: PageProps) {
                     <OfficeListItem office={office} key={office.id} />
                 ))}
             </div>
-        </OfficesLayout>
+        </AdminLayout>
     );
 }

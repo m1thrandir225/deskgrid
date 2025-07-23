@@ -1,39 +1,27 @@
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import FormContainer from '@/components/form-container';
 import InputError from '@/components/input-error';
-import {  FormEventHandler } from 'react';
-import { CreateEmployeeForm } from '@/pages/employees/create';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { CreateEmployeeForm } from '@/pages/employees/create';
 import { LoaderCircle } from 'lucide-react';
+import React, { FormEventHandler } from 'react';
 
 export interface EmployeeFormProps {
-    mode: "Create" | "Edit"
+    mode: 'Create' | 'Edit';
     firstNameValue: string;
     lastNameValue: string;
     emailValue: string;
-    firstNameErrors?: string;
-    lastNameErrors?: string;
-    emailErrors?: string;
+    errors: Partial<Record<keyof CreateEmployeeForm, string>>;
     setInput: (newValue: string, field: keyof CreateEmployeeForm) => void;
     isLoading: boolean;
     onSubmit: FormEventHandler;
 }
 
 const EmployeeForm: React.FC<EmployeeFormProps> = (props) => {
-    const {
-        mode,
-        firstNameValue,
-        lastNameValue,
-        emailValue,
-        firstNameErrors,
-        lastNameErrors,
-        emailErrors,
-        setInput,
-        isLoading,
-        onSubmit
-    } = props;
+    const { mode, firstNameValue, lastNameValue, emailValue, errors, setInput, isLoading, onSubmit } = props;
     return (
-        <form className={"flex flex-col gap-6 rounded-md border p-8 w-full mx-auto sm:max-w-[425px]"} onSubmit={onSubmit}>
+        <FormContainer onSubmit={onSubmit}>
             <div className="grid gap-2">
                 <Label htmlFor="name">First Name</Label>
                 <Input
@@ -41,11 +29,11 @@ const EmployeeForm: React.FC<EmployeeFormProps> = (props) => {
                     type="text"
                     required
                     value={firstNameValue}
-                    onChange={(e) => setInput(e.target.value, "first_name")}
+                    onChange={(e) => setInput(e.target.value, 'first_name')}
                     disabled={isLoading}
                     placeholder="John"
                 />
-                <InputError message={firstNameErrors} />
+                <InputError message={errors.first_name} />
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="name">Last Name</Label>
@@ -54,11 +42,11 @@ const EmployeeForm: React.FC<EmployeeFormProps> = (props) => {
                     type="text"
                     required
                     value={lastNameValue}
-                    onChange={(e) => setInput(e.target.value, "last_name")}
+                    onChange={(e) => setInput(e.target.value, 'last_name')}
                     disabled={isLoading}
                     placeholder="Doe"
                 />
-                <InputError message={lastNameErrors} />
+                <InputError message={errors.last_name} />
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="name">Email</Label>
@@ -67,18 +55,18 @@ const EmployeeForm: React.FC<EmployeeFormProps> = (props) => {
                     type="email"
                     required
                     value={emailValue}
-                    onChange={(e) => setInput(e.target.value, "email")}
+                    onChange={(e) => setInput(e.target.value, 'email')}
                     disabled={isLoading}
                     placeholder="john.doe@gmail.com"
                 />
-                <InputError message={emailErrors} />
+                <InputError message={errors.email} />
             </div>
             <Button type="submit" tabIndex={5} className="w-full self-center" disabled={isLoading}>
                 {isLoading && <LoaderCircle className="h- 4 w-4 animate-spin" />}
-                {mode + " employee"}
+                {mode + ' employee'}
             </Button>
-        </form>
-    )
-}
+        </FormContainer>
+    );
+};
 
 export default EmployeeForm;

@@ -1,7 +1,7 @@
-import React, { FormEventHandler } from 'react';
-import { User } from '@/types';
+import React, { FormEventHandler, useMemo } from 'react';
+import { BreadcrumbItem, User } from '@/types';
 import { Employee } from '@/types/employee';
-import OfficesLayout from '@/layouts/offices/layout';
+import AdminLayout from '@/layouts/admin/layout';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import EmployeeForm from '@/components/employees/employee-form';
 import { useForm } from '@inertiajs/react';
@@ -25,11 +25,24 @@ const EmployeeEditPage: React.FC<PageProps> = (props) => {
         last_name: employee.name.split(" ")[1]
     });
 
+    const breadcrumbs = useMemo(() => {
+        return [
+            {
+                title: "Employees",
+                href: "/employees"
+            },
+            {
+                title: `Editing: ${employee.name}`,
+                href: `/employees/${employee.id}/edit`
+            }
+        ] as BreadcrumbItem[];
+    },[employee]);
+
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault()
     }
     return (
-        <OfficesLayout title={"Edit Employee"} breadcrumbs={[]}>
+        <AdminLayout title={"Edit Employee"} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={`Editing: ${employee.name}`} description={`Edit details about the employee`}/>
             <EmployeeForm
                 mode={"Edit"}
@@ -38,12 +51,10 @@ const EmployeeEditPage: React.FC<PageProps> = (props) => {
                 emailValue={data.email}
                 setInput={(newValue, field) => setData(field, newValue)}
                 isLoading={processing}
-                emailErrors={errors.email}
-                lastNameErrors={errors.last_name}
-                firstNameErrors={errors.first_name}
+                errors={errors}
                 onSubmit={handleSubmit}
             />
-        </OfficesLayout>
+        </AdminLayout>
     )
 }
 

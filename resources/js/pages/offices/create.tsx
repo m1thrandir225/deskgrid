@@ -16,7 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type CreateOfficeForm = {
+export type CreateOfficeForm = {
     name: string;
     address: string;
 };
@@ -39,14 +39,12 @@ const CreateOfficePage: React.FC = () => {
 
     const formProps: OfficeFormProps = {
         nameValue: data.name,
-        setName: (newValue) => setData('name', newValue),
-        nameErrors: errors.name,
-        addressValue: data.address,
-        setAddress: (newValue) => setData('address', newValue),
-        addressErrors: errors.address,
+        setInput: (newValue, field) => setData(field, newValue),
         isLoading: processing,
+        errors: errors,
         type: 'create',
         onSubmit: handleSubmit,
+        addressValue: data.address,
     };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

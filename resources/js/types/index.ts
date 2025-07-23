@@ -1,4 +1,5 @@
 import { LucideIcon } from 'lucide-react';
+import { FlashMessage } from '@/types/page';
 
 export interface Auth {
     user: User;
@@ -23,8 +24,8 @@ export interface NavItem {
 
 export interface SharedData {
     name: string;
-    quote: { message: string; author: string };
     auth: Auth;
+    flash: FlashMessage;
     [key: string]: unknown;
 }
 

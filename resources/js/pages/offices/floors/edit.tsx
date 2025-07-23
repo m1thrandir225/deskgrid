@@ -1,7 +1,7 @@
 import { Floor } from '@/types/floor';
 import { Office } from '@/types/office';
 import { BreadcrumbItem } from '@/types';
-import OfficesLayout from '@/layouts/offices/layout';
+import AdminLayout from '@/layouts/admin/layout';
 import React, { FormEventHandler, useMemo } from 'react';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import FloorForm, { FloorFormProps } from '@/components/floor/floor-form';
@@ -16,6 +16,7 @@ interface PageProps {
 type EditFloorForm = {
     name: string;
     plan_image: File | null;
+    office_id: number;
 }
 
 const FloorEditPage: React.FC<PageProps> = (props) => {
@@ -46,9 +47,10 @@ const FloorEditPage: React.FC<PageProps> = (props) => {
         ] as BreadcrumbItem[];
     }, [floor, office])
 
-    const { data, setData, processing, errors, put} = useForm<EditFloorForm>({
+    const { data, setData, processing, errors } = useForm<EditFloorForm>({
         name: floor.name,
-        plan_image: null
+        plan_image: null,
+        office_id: office.id
     })
 
     const handleSubmit: FormEventHandler = (e) => {
@@ -58,7 +60,7 @@ const FloorEditPage: React.FC<PageProps> = (props) => {
         if (data.plan_image) {
             formData.append('plan_image', data.plan_image);
         }
-        formData.append('_method', 'PATCH'); // 👈 critical
+        formData.append('_method', 'PATCH');
 
         router.post(route("offices.floors.update", [office.id, floor.id]), formData, {
             forceFormData: true,
@@ -69,21 +71,19 @@ const FloorEditPage: React.FC<PageProps> = (props) => {
     }
     const formProps: FloorFormProps = {
         nameValue: data.name,
-        setName: (newVal) => setData('name', newVal),
-        nameErrors: errors.name,
         planImageValue: data.plan_image,
-        setPlanImage: (newVal) => setData('plan_image', newVal),
-        planImageErrors: errors.plan_image,
         isLoading: processing,
         onSubmit: handleSubmit,
-        officeId: office.id,
-        planImageUrl: floor.plan_image_url ?? null
+        officeIdValue: office.id,
+        planImageUrl: floor.plan_image_url ?? null,
+        errors: errors,
+        setInput: (newValue, field) => setData(field, newValue)
     };
     return (
-        <OfficesLayout title={floor.name} breadcrumbs={breadcrumbs}>
+        <AdminLayout title={floor.name} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={`Editing: ${floor.name}`} description={"Update the floor details"} />
             <FloorForm {...formProps} />
-        </OfficesLayout>
+        </AdminLayout>
     )
 }
 export default FloorEditPage;
