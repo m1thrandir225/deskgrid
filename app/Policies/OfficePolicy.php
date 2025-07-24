@@ -14,7 +14,7 @@ class OfficePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->role === UserRole::Admin;
     }
 
     /**
@@ -22,7 +22,7 @@ class OfficePolicy
      */
     public function view(User $user, Office $office): bool
     {
-        return $user->id === $office->user_id;
+        return $user->role === UserRole::Admin;
     }
 
     /**

@@ -14,13 +14,21 @@ use Inertia\Response;
 
 class ReservationController extends Controller
 {
+
+    public function index(): Response
+    {
+        $reservations = Reservation::query()->select()->get();
+        return Inertia::render("reservations/index", [
+            "reservations" => $reservations,
+        ]);
+    }
+
     /**
     * Show the create reservation page.
     */
-    public function create(Request $request): Response
+    public function create(Request $request): RedirectResponse
     {
-        Gate::authorize('create', Reservation::class);
-        return Inertia::render('desk/create');
+        return to_route("reservations.index");
     }
 
     /**
@@ -34,37 +42,30 @@ class ReservationController extends Controller
 
         $validated = $request->validated();
 
-        Reservation::create([
+        $reservation = Reservation::create([
             'desk_id' => $validated['desk_id'],
             'user_id' => $validated['user_id'],
             'reservation_date' => $validated['reservation_date'],
             'status' => ReservationStatus::Approved
         ]);
 
-        return to_route('desks.show', $validated['desk_id']);
+        return to_route('reservations.index')->with('success', 'Reservation created successfully.');
     }
 
     /**
     * Show the current reservation
     */
-    public function show(Reservation $reservation): Response
+    public function show(Reservation $reservation): RedirectResponse
     {
-        Gate::authorize('show', $reservation);
-        return Inertia::render('reservations/show', [
-            'reservation' => $reservation
-        ]);
+        return to_route("reservations.index", $reservation);
     }
 
     /*
     * Show the edit form
     */
-    public function edit(Reservation $reservation): Response
+    public function edit(Reservation $reservation): RedirectResponse
     {
-        Gate::authorize('update', $reservation);
-
-        return Inertia::render('reservations/edit', [
-            'reservation' => $reservation
-        ]);
+        return to_route("reservations.index");
     }
 
     /*
@@ -82,7 +83,7 @@ class ReservationController extends Controller
             'reservation_date' => $validated['reservation_date']
         ]);
 
-        return to_route('desks.show', $reservation->desk_id);
+        return to_route('reservations.show', $reservation->desk_id)->with("message", "Reservation updated successfully");
     }
 
     /*
@@ -94,6 +95,6 @@ class ReservationController extends Controller
 
         $reservation->delete();
 
-        return to_route('reservations.index');
+        return to_route('reservations.index')->with("message", "Reservation deleted.");
     }
 }

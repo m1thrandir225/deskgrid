@@ -5,7 +5,7 @@ import AdminLayout from '@/layouts/admin/layout';
 import type { Office } from '@/types/office';
 import { Link, useForm } from '@inertiajs/react';
 import { Edit2, Plus, TrashIcon } from 'lucide-react';
-import { FormEventHandler, useMemo } from 'react';
+import React, { FormEventHandler, useMemo } from 'react';
 
 interface PageProps {
     office: Office;
@@ -14,7 +14,10 @@ interface PageProps {
 const OfficeShowPage: React.FC<PageProps> = (props) => {
     const { office } = props;
 
-    const floors = office.floors;
+    const floors = useMemo(() => {
+        return office.floors;
+    }, [office])
+
     const breadcrumbs = useMemo(() => {
         return [
             {
@@ -34,6 +37,7 @@ const OfficeShowPage: React.FC<PageProps> = (props) => {
         e.preventDefault();
         destroy(route('offices.destroy', office.id));
     };
+
     return (
         <AdminLayout title={`${office.name} Details`} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={office.name} description={office.address}>
@@ -49,15 +53,19 @@ const OfficeShowPage: React.FC<PageProps> = (props) => {
                 </form>
             </OfficeLayoutHeader>
             <div className="flex flex-col items-start">
-                <div className="flex w-full flex-row items-center justify-between">
-                    <h1> Floors </h1>
+                <div className="flex w-full flex-row items-center justify-between px-4">
+                    <h1 className="text-lg font-extrabold">Floors</h1>
                     <Button asChild size={'icon'} variant={'outline'}>
                         <Link href={`/offices/${office.id}/floors/create`}>
                             <Plus size={24} />
                         </Link>
                     </Button>
                 </div>
-                {floors && <FloorTable items={floors} officeId={office.id} />}
+                {floors && floors.length > 0 ? (
+                    <FloorTable items={floors} officeId={office.id} />
+                ) : (
+                    <p>Please create a floor to see it show up here.</p>
+                )}
             </div>
         </AdminLayout>
     );

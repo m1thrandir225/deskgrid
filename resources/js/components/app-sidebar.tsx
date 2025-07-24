@@ -19,11 +19,6 @@ const mainNavItems: NavItem[] = [
         icon: BuildingIcon,
     },
     {
-        title: 'Floors',
-        url: '/floors',
-        icon: LayersIcon,
-    },
-    {
         title: 'Employees',
         url: '/employees',
         icon: UsersIcon,
