@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ReservationStatus;
 use App\Http\Requests\Reservation\CreateReservationRequest;
 use App\Http\Requests\Reservation\UpdateReservationRequest;
+use App\Models\Desk;
 use App\Models\Reservation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,11 +16,29 @@ use Inertia\Response;
 class ReservationController extends Controller
 {
 
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $reservations = Reservation::query()->select()->get();
+        $reservationDate = $request->date('reservation_date', today());
+
+        $desks = Desk::query()
+            ->with("floor.office")
+            ->with(['reservations' => function ($query) use ($reservationDate) {
+                $query->whereDate('reservation_date', $reservationDate)
+                    ->with('user:id,name,email');
+            }])
+            ->when($request->input("office_id", function ($query, $officeId) {
+                $query->whereHas('floor', function ($q) use ($officeId) {
+                    $q->where("office_id", $officeId);
+                });
+            }))
+            ->when($request->input("floor_id"), function ($query, $floorId) {
+                $query->where("floor_id", $floorId);
+            })
+            ->get();
+
         return Inertia::render("reservations/index", [
-            "reservations" => $reservations,
+            "desks" => $desks,
+            "filters" => $request->only(['office_id', 'floor_id', 'reservation_date'])
         ]);
     }
 

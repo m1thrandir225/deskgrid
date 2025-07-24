@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePage } from '@inertiajs/react';
 
 const ReservationsPage: React.FC = () => {
     return (
