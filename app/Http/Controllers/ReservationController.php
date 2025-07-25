@@ -6,6 +6,8 @@ use App\Enums\ReservationStatus;
 use App\Http\Requests\Reservation\CreateReservationRequest;
 use App\Http\Requests\Reservation\UpdateReservationRequest;
 use App\Models\Desk;
+use App\Models\Floor;
+use App\Models\Office;
 use App\Models\Reservation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,46 +17,64 @@ use Inertia\Response;
 
 class ReservationController extends Controller
 {
-
     public function index(Request $request): Response
     {
-        $reservationDate = $request->date('reservation_date', today());
+        $offices = Office::query()->get();
+        $selectedOfficeId = $request->input('office_id');
+        $selectedFloorId = $request->input('floor_id');
 
-        $desks = Desk::query()
-            ->with("floor.office")
-            ->with(['reservations' => function ($query) use ($reservationDate) {
-                $query->whereDate('reservation_date', $reservationDate)
-                    ->with('user:id,name,email');
-            }])
-            ->when($request->input("office_id", function ($query, $officeId) {
-                $query->whereHas('floor', function ($q) use ($officeId) {
-                    $q->where("office_id", $officeId);
-                });
-            }))
-            ->when($request->input("floor_id"), function ($query, $floorId) {
-                $query->where("floor_id", $floorId);
-            })
-            ->get();
+        $reservationDate = $request->date('reservation_date');
+        if (!$reservationDate) {
+            $reservationDate = today();
+        }
+        if($reservationDate->isAfter(today()->addDay())) {
+            $reservationDate = today()->addDay();
+        }
+
+        $floors = collect();
+        if($selectedOfficeId) {
+            $floors = Floor::query()
+                ->where('office_id', $selectedOfficeId)
+                ->get();
+        }
+
+        $desks = collect();
+        if($selectedFloorId) {
+            $desks = Desk::query()
+                ->with("floor.office")
+                ->with(['reservations' => function ($query) use ($reservationDate) {
+                    $query->where('reservation_date', $reservationDate)
+                        ->with("user:id,name,email");
+                }])
+                ->where('floor_id', $selectedFloorId)
+                ->get();
+        }
 
         return Inertia::render("reservations/index", [
+            "offices" => $offices,
+            "floors" => $floors,
             "desks" => $desks,
-            "filters" => $request->only(['office_id', 'floor_id', 'reservation_date'])
+            "filters" => [
+                "office_id" => $selectedOfficeId,
+                "floor_id" => $selectedFloorId,
+                "reservation_date" => $reservationDate->toDateString(),
+            ]
         ]);
     }
 
     /**
-    * Show the create reservation page.
-    */
+     * Show the create reservation page.
+     */
     public function create(Request $request): RedirectResponse
     {
-        return to_route("reservations.index");
+        return to_route("reservations.index", $request->all());
     }
 
     /**
-    * Handle an incoming new reservation request
-    *
-    * @throws \Illuminate\Validation\ValidationException
-    */
+     * Handle an incoming new reservation request
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function store(CreateReservationRequest $request): RedirectResponse
     {
         Gate::authorize('create', Reservation::class);
@@ -72,8 +92,8 @@ class ReservationController extends Controller
     }
 
     /**
-    * Show the current reservation
-    */
+     * Show the current reservation
+     */
     public function show(Reservation $reservation): RedirectResponse
     {
         return to_route("reservations.index", $reservation);
