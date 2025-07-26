@@ -9,32 +9,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        url: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
-
-const rightNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        url: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
-];
+import {appMenues} from '@/constants/menu-items';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -66,7 +46,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
-                                            {mainNavItems.map((item) => (
+                                            {appMenues.mainNavItems.map((item) => (
                                                 <Link key={item.title} href={item.url} className="flex items-center space-x-2 font-medium">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
@@ -75,7 +55,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         </div>
 
                                         <div className="flex flex-col space-y-4">
-                                            {rightNavItems.map((item) => (
+                                            {appMenues.rightNavItems.map((item) => (
                                                 <a
                                                     key={item.title}
                                                     href={item.url}
@@ -102,7 +82,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
                         <NavigationMenu className="flex h-full items-stretch">
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
+                                {appMenues.mainNavItems.map((item, index) => (
                                     <NavigationMenuItem key={index} className="relative flex h-full items-center">
                                         <Link
                                             href={item.url}
@@ -130,7 +110,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
                             <div className="hidden lg:flex">
-                                {rightNavItems.map((item) => (
+                                {appMenues.rightNavItems.map((item) => (
                                     <TooltipProvider key={item.title} delayDuration={0}>
                                         <Tooltip>
                                             <TooltipTrigger>

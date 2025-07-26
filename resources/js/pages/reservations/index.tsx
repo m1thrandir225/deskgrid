@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button';
 import { ChevronDownIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
+import AppHeaderLayout from '@/layouts/app/app-header-layout';
 
 interface PageProps {
     offices: Office[];
@@ -65,7 +66,7 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
     tomorrow.setDate(today.getDate() + 1);
 
     return (
-        <>
+        <AppHeaderLayout breadcrumbs={[]}>
             <div className="container mx-auto p-4 sm:p-6 lg:p-8">
                 <h1 className="text-3xl font-bold mb-6 text-gray-800">Make a Reservation</h1>
                 <div className="flex flex-col md:flex-row gap-4 mb-8 p-6 border rounded-xl bg-white shadow-sm">
@@ -150,7 +151,7 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
                     </div>
                 )}
             </div>
-        </>
+        </AppHeaderLayout>
     )
 }
 
