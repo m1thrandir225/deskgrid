@@ -3,7 +3,11 @@ import { Office } from '@/types/office';
 import { Floor } from '@/types/floor';
 import { Desk } from '@/types/desk';
 import { router } from '@inertiajs/react';
-import { DatePicker } from '@/components/ui/date-picker';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { ChevronDownIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
 
 interface PageProps {
     offices: Office[];
@@ -21,11 +25,11 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
 
     const [selectedOffice, setSelectedOffice] = useState(filters.office_id || '');
     const [selectedFloor, setSelectedFloor] = useState(filters.floor_id || '');
-    const [selectedDate, setSelectedDate] = useState(filters.reservation_date ? new Date(filters.reservation_date) : new Date());
-
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(filters.reservation_date ? new Date(filters.reservation_date) : new Date());
+    const [dateDialogOpen, setDateDialogOpen] = useState<boolean>(false);
     useEffect(() => {
-        const queryParams: any = {
-            reservation_date: selectedDate.toISOString().split('T')[0]
+        const queryParams: Record<string, string | undefined> = {
+            reservation_date: selectedDate?.toDateString()
         };
         if (selectedOffice) {
             queryParams.office_id = selectedOffice;
@@ -103,19 +107,41 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
 
                     {/* Date Picker */}
                     <div className="flex-1">
-                        <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                        <DatePicker
-                            // selected={selectedDate}
-                            // onChange={(date: Date) => setSelectedDate(date)}
-                            // dateFormat="yyyy-MM-dd"
-                            // minDate={today}
-                            // maxDate={tomorrow}
-                            //className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                        />
+                        <div className="flex flex-col gap-3">
+                            <Label htmlFor="date" className="px-1">
+                                Date
+                            </Label>
+                            <Popover open={dateDialogOpen} onOpenChange={setDateDialogOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        id="date"
+                                        className="w-48 justify-between font-normal"
+                                    >
+                                        {selectedDate ? selectedDate.toLocaleDateString() : "Select date"}
+                                        <ChevronDownIcon />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        disabled={{
+                                            before: today
+                                        }}
+
+                                        selected={selectedDate}
+                                        captionLayout="dropdown"
+                                        onSelect={(date) => {
+                                            setSelectedDate(date)
+                                            setDateDialogOpen(false)
+                                        }}
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </div>
                     </div>
                 </div>
 
-                {/* Floor Editor - Renders when desks are loaded */}
                 {desks && desks.length > 0 && selectedFloor ? (
                     <h1>floor editor</h1>
                 ) : (
