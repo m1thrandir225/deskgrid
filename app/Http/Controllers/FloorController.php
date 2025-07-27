@@ -20,12 +20,6 @@ use Ramsey\Uuid\Uuid as UuidUuid;
 
 class FloorController extends Controller
 {
-    protected IStorageService $storageService;
-
-    public function __construct(IStorageService $storageService)
-    {
-        $this->storageService = $storageService;
-    }
 
     public function index(Request $request): Response
     {

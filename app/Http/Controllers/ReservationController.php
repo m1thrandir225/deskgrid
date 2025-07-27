@@ -24,6 +24,7 @@ class ReservationController extends Controller
         $selectedFloorId = $request->input('floor_id');
 
         $reservationDate = $request->date('reservation_date');
+
         if (!$reservationDate) {
             $reservationDate = today();
         }
@@ -88,7 +89,7 @@ class ReservationController extends Controller
             'status' => ReservationStatus::Approved
         ]);
 
-        return to_route('reservations.index')->with('success', 'Reservation created successfully.');
+        return to_route('reservations.index')->with('message', 'Reservation created successfully.');
     }
 
     /**
