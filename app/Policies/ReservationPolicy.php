@@ -30,7 +30,7 @@ class ReservationPolicy
      */
     public function create(User $user): bool
     {
-        return $user->role === UserRole::Employee;
+        return $user->role === UserRole::Employee && !$user->hasReservationToday();
     }
 
     /**

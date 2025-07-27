@@ -73,4 +73,9 @@ class User extends Authenticatable
             get: fn () => $this->password !== null,
         );
     }
+
+    public function hasReservationToday(): bool
+    {
+        return $this->reservations()->whereDate("reservation_date", today())->exists();
+    }
 }
