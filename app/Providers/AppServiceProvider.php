@@ -16,13 +16,12 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
-        $this->app->bind(IStorageService::class, function ($app) {
-            $disk = config('filesystems.default');
-            $root = config("filesystems.disks.{$disk}.root", '');
 
+        if ($this->app->environment('local') && class_exists(\Laravel\Telescope\TelescopeServiceProvider::class)) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
 
-            return new StorageService($disk, $root);
-        });
     }
 
     /**
