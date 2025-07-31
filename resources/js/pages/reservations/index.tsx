@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { ChevronDownIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import FloorViewer from '@/components/floor/viewer/floor-viewer';
 
 interface PageProps {
     offices: Office[];
@@ -48,8 +50,8 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
         }
     }, [selectedOffice, selectedFloor, selectedDate]);
 
-    const handleOfficeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const officeId = e.target.value;
+    const handleOfficeChange = (value: string) => {
+        const officeId = value
         setSelectedOffice(officeId);
         setSelectedFloor('');
         if (!officeId) {
@@ -57,8 +59,8 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
         }
     };
 
-    const handleFloorChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedFloor(e.target.value);
+    const handleFloorChange = (newValue: string) => {
+        setSelectedFloor(newValue);
     };
 
     const today = new Date();
@@ -67,84 +69,86 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
 
     return (
         <AppHeaderLayout breadcrumbs={[]}>
-            <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-                <h1 className="text-3xl font-bold mb-6 text-gray-800">Make a Reservation</h1>
-                <div className="flex flex-col md:flex-row gap-4 mb-8 p-6 border rounded-xl bg-white shadow-sm">
+            <div className="container mx-auto py-8 ">
+                <h1 className="text-3xl font-bold mb-6">Make a Reservation</h1>
+                <div className="flex flex-col md:flex-row justify-evenly w-full gap-4 mb-8 p-6 border rounded-xl shadow-sm">
                     {/* Office Selector */}
                     <div className="flex-1">
-                        <label htmlFor="office" className="block text-sm font-medium text-gray-700 mb-1">Office</label>
-                        <select
-                            id="office"
-                            name="office_id"
+                        <Label htmlFor="office" className="block text-sm font-medium mb-1">Office</Label>
+                        <Select
                             value={selectedOffice}
-                            onChange={handleOfficeChange}
-                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            onValueChange={handleOfficeChange}
                         >
-                            <option value="">Select an Office</option>
-                            {offices.map((office) => (
-                                <option key={office.id} value={office.id}>{office.name}</option>
-                            ))}
-                        </select>
+                            <SelectTrigger className={"w-full"}>
+                                <SelectValue placeholder={"Select an Office"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {offices.map((office) => (
+                                    <SelectItem value={office.id.toString()} key={office.id}>{office.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {/* Floor Selector */}
-                    <div className="flex-1">
-                        <label htmlFor="floor" className="block text-sm font-medium text-gray-700 mb-1">Floor</label>
-                        <select
-                            id="floor"
-                            name="floor_id"
+                    <div className="flex-1 w-full">
+                        <Label htmlFor="floor" className="block text-sm font-medium mb-1">Floor</Label>
+                        <Select
                             value={selectedFloor}
-                            onChange={handleFloorChange}
-                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            onValueChange={handleFloorChange}
                             disabled={!selectedOffice || floors.length === 0}
-                        >
-                            <option value="">Select a Floor</option>
-                            {floors.map((floor) => (
-                                <option key={floor.id} value={floor.id}>{floor.name}</option>
-                            ))}
-                        </select>
+                            >
+                            <SelectTrigger className={"w-full"}>
+                                <SelectValue placeholder={"Select an Office"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {floors.map((floor) => (
+                                    <SelectItem value={floor.id.toString()} key={floor.id}>{floor.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
-
                     {/* Date Picker */}
-                    <div className="flex-1">
-                        <div className="flex flex-col gap-3">
-                            <Label htmlFor="date" className="px-1">
-                                Date
-                            </Label>
-                            <Popover open={dateDialogOpen} onOpenChange={setDateDialogOpen}>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        id="date"
-                                        className="w-48 justify-between font-normal"
-                                    >
-                                        {selectedDate ? selectedDate.toLocaleDateString() : "Select date"}
-                                        <ChevronDownIcon />
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                                    <Calendar
-                                        mode="single"
-                                        disabled={{
-                                            before: today
-                                        }}
+                    <div className="flex-1 w-full">
+                        <Label htmlFor="office" className="block text-sm font-medium mb-1">Date</Label>
+                        <Popover open={dateDialogOpen} onOpenChange={setDateDialogOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    id="date"
+                                    className="w-48 justify-between font-normal"
+                                >
+                                    {selectedDate ? selectedDate.toLocaleDateString() : "Select date"}
+                                    <ChevronDownIcon />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    disabled={{
+                                        before: today
+                                    }}
 
-                                        selected={selectedDate}
-                                        captionLayout="dropdown"
-                                        onSelect={(date) => {
-                                            setSelectedDate(date)
-                                            setDateDialogOpen(false)
-                                        }}
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                        </div>
+                                    selected={selectedDate}
+                                    captionLayout="dropdown"
+                                    onSelect={(date) => {
+                                        setSelectedDate(date)
+                                        setDateDialogOpen(false)
+                                    }}
+                                />
+                            </PopoverContent>
+                        </Popover>
                     </div>
                 </div>
 
                 {desks && desks.length > 0 && selectedFloor ? (
-                    <h1>floor editor</h1>
+                    <FloorViewer
+                        desks={desks}
+                        reservations={[]}
+                        selectedDate={selectedDate ?? new Date()}
+                        floor={floors.find(f => f.id.toString() === selectedFloor)!}
+                    />
                 ) : (
                     <div className="text-center py-10 px-4 bg-gray-50 rounded-lg">
                         <p className="text-gray-500">Please select an office and a floor to see available desks.</p>
