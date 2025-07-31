@@ -1,3 +1,5 @@
+import { Reservation, ReservationWithUser } from '@/types/reservation';
+
 /**
  * Desk Model
  */
@@ -11,6 +13,9 @@ export interface Desk {
     is_active: boolean;
 }
 
+export interface ReservationDesk extends Desk {
+    reservations: ReservationWithUser[];
+}
 /**
  * DTO for Desk Model
  */

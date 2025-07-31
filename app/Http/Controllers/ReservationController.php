@@ -28,9 +28,9 @@ class ReservationController extends Controller
         if (!$reservationDate) {
             $reservationDate = today();
         }
-        if($reservationDate->isAfter(today()->addDay())) {
-            $reservationDate = today()->addDay();
-        }
+//        if($reservationDate->isAfter(today()->addDay())) {
+//            $reservationDate = today()->addDay();
+//        }
 
         $floors = collect();
         if($selectedOfficeId) {
@@ -40,12 +40,15 @@ class ReservationController extends Controller
         }
 
         $desks = collect();
+
         if($selectedFloorId) {
             $desks = Desk::query()
-                ->with("floor.office")
+                ->with("floor")
                 ->with(['reservations' => function ($query) use ($reservationDate) {
-                    $query->where('reservation_date', $reservationDate)
-                        ->with("user:id,name,email");
+                    $query
+                        ->where('reservation_date', $reservationDate->toDateString())
+                        ->with("user:id,name,email")
+                    ->get();
                 }])
                 ->where('floor_id', $selectedFloorId)
                 ->get();
@@ -84,7 +87,7 @@ class ReservationController extends Controller
 
         $reservation = Reservation::create([
             'desk_id' => $validated['desk_id'],
-            'user_id' => $validated['user_id'],
+            'user_id' => $request->user()->id,
             'reservation_date' => $validated['reservation_date'],
             'status' => ReservationStatus::Approved
         ]);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Office } from '@/types/office';
 import { Floor } from '@/types/floor';
-import { Desk } from '@/types/desk';
+import { Desk, ReservationDesk } from '@/types/desk';
 import { router } from '@inertiajs/react';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -15,7 +15,7 @@ import FloorViewer from '@/components/floor/viewer/floor-viewer';
 interface PageProps {
     offices: Office[];
     floors: Floor[];
-    desks: Desk[];
+    desks: ReservationDesk[];
     filters: {
         office_id?: string;
         floor_id?: string;
@@ -145,7 +145,6 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
                 {desks && desks.length > 0 && selectedFloor ? (
                     <FloorViewer
                         desks={desks}
-                        reservations={[]}
                         selectedDate={selectedDate ?? new Date()}
                         floor={floors.find(f => f.id.toString() === selectedFloor)!}
                     />

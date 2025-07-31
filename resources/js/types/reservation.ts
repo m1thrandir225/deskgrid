@@ -5,3 +5,11 @@ export interface Reservation {
     reservation_date: string;
     status: 'pending' | 'approved' | 'cancelled';
 }
+
+export interface ReservationWithUser extends Reservation {
+    user: {
+        name: string;
+        id: string;
+        email: string;
+    }
+}

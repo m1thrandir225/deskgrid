@@ -1,24 +1,23 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Desk } from '@/types/desk';
-import { Reservation } from '@/types/reservation';
+import { Desk, ReservationDesk } from '@/types/desk';
+import { ReservationWithUser } from '@/types/reservation';
 import { eachDayOfInterval, endOfWeek, format, isBefore, startOfToday, startOfWeek, isWeekend} from 'date-fns';
 import { router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { SharedData } from '@/types';
 import { Floor } from '@/types/floor';
 import { getFileUrl } from '@/lib/utils';
-import { MousePointerClick, SquareX, TicketX } from 'lucide-react';
+import { CalendarCheck, CircleOff, MousePointerClick, TicketX } from 'lucide-react';
 
 interface FloorViewerProps {
-    desks: Desk[];
-    reservations: Reservation[];
+    desks: ReservationDesk[];
     selectedDate: Date;
     floor: Floor;
 }
 
-const FloorViewer: React.FC<FloorViewerProps> = ({ desks, reservations, selectedDate, floor }) => {
+const FloorViewer: React.FC<FloorViewerProps> = ({ desks, selectedDate, floor }) => {
     const { auth } = usePage<SharedData>().props;
-    const [selectedDesk, setSelectedDesk] = React.useState<Desk | null>(null);
+    const [selectedDesk, setSelectedDesk] = React.useState<ReservationDesk | null>(null);
     const floorPlanRef = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLImageElement>(null);
     const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
@@ -53,24 +52,29 @@ const FloorViewer: React.FC<FloorViewerProps> = ({ desks, reservations, selected
         [imageSize],
     );
 
-    const getDeskStatus = (desk: Desk, date: Date) => {
-        const reservation = reservations.find((r) => r.desk_id === desk.id && r.reservation_date === format(date, 'yyyy-MM-dd'));
+    const getDeskStatus = (desk: ReservationDesk, date: Date) => {
 
         return {
-            isReserved: !!reservation,
-            isOwnReservation: reservation?.user_id === auth.user.id,
-            reservation,
+            isReserved: desk.reservations.length > 0 && desk.reservations.find((reser) => reser.reservation_date === format(date, 'yyyy-MM-dd')) !== undefined,
+            isOwnReservation: desk.reservations.find((reservation) => reservation.user_id === auth.user.id),
+            reservation: desk.reservations.find((reservation) => reservation.reservation_date === format(date, 'yyyy-MM-dd')) as ReservationWithUser | null
         };
     };
 
-    const handleDeskClick = (desk: Desk) => {
-        setSelectedDesk(desk);
-    };
 
-    const handleReserveDesk = (desk: Desk) => {
+    const handleReserveDesk = (desk: Desk, reservationDate: Date) => {
         router.post(route('reservations.store'), {
             desk_id: desk.id,
-            reservation_date: format(selectedDate, 'yyyy-MM-dd'),
+            reservation_date: format(reservationDate, 'yyyy-MM-dd'),
+        }, {
+            preserveState: false,
+            preserveScroll: true,
+            onSuccess: (data) => {
+                console.log(data)
+            },
+            onError: (error) => {
+                console.error(error)
+            }
         });
     };
 
@@ -100,13 +104,13 @@ const FloorViewer: React.FC<FloorViewerProps> = ({ desks, reservations, selected
                         return (
                             <div
                                 key={desk.id}
-                                onClick={() => handleDeskClick(desk)}
+                                onClick={() => setSelectedDesk(desk)}
                                 className={`absolute flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-2 text-xs font-bold transition-all select-none ${
                                     isSelected
                                         ? 'border-blue-700 bg-blue-500 text-white'
                                         : isReserved
                                             ? isOwnReservation
-                                                ? 'border-blue-700 bg-blue-500 text-white'
+                                                ? 'border-purple-700 bg-purple-500 text-white'
                                                 : 'border-red-700 bg-red-500 text-white'
                                             : 'border-green-600 bg-green-400 text-white'
                                 }`}
@@ -147,30 +151,36 @@ const FloorViewer: React.FC<FloorViewerProps> = ({ desks, reservations, selected
                                 {weekDays.map((date) => {
                                     const { isReserved, isOwnReservation, reservation } = getDeskStatus(selectedDesk, date);
                                     return (
-                                        <div key={date.toISOString()} className="flex items-center justify-between rounded border p-2">
+                                        <div
+                                            key={date.toISOString()}
+                                             className="flex items-center justify-between border p-4 rounded-md">
                                             <div>
                                                 <p className="font-medium">{format(date, 'EEEE')}</p>
                                                 <p className="text-sm text-gray-500">{format(date, 'MMM d, yyyy')}</p>
                                             </div>
                                             {isReserved ? (
-                                                <div className="text-right">
-                                                    <p className="text-sm">Reserved</p>
-                                                    {isOwnReservation && (
+                                                    isOwnReservation ? (
                                                         <Button
                                                             variant="destructive"
                                                             size="sm"
                                                             onClick={() => reservation && handleCancelReservation(reservation.id)}
                                                         >
+                                                            <CircleOff />
                                                             Cancel
                                                         </Button>
-                                                    )}
-                                                </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2">
+                                                            Reserved by: {reservation?.user.name}
+                                                        </div>
+                                                    )
                                             ) : (
                                                 <Button
+                                                    variant={"default"}
                                                     size="sm"
-                                                    onClick={() => handleReserveDesk(selectedDesk)}
-                                                    disabled={format(date, 'yyyy-MM-dd') !== format(selectedDate, 'yyyy-MM-dd')}
+                                                    onClick={() => handleReserveDesk(selectedDesk, date)}
+                                                    disabled={format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')}
                                                 >
+                                                    <CalendarCheck />
                                                     Reserve
                                                 </Button>
                                             )}
