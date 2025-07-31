@@ -11,6 +11,8 @@ import { Calendar } from '@/components/ui/calendar';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import FloorViewer from '@/components/floor/viewer/floor-viewer';
+import { BreadcrumbItem } from '@/types';
+import { format } from 'date-fns';
 
 interface PageProps {
     offices: Office[];
@@ -23,6 +25,13 @@ interface PageProps {
     }
 }
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Reservations',
+        href: '/reservations',
+    },
+];
+
 const ReservationsPage: React.FC<PageProps> = (props) => {
     const { offices, filters, floors, desks } = props;
 
@@ -32,7 +41,7 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
     const [dateDialogOpen, setDateDialogOpen] = useState<boolean>(false);
     useEffect(() => {
         const queryParams: Record<string, string | undefined> = {
-            reservation_date: selectedDate?.toDateString()
+            reservation_date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined
         };
         if (selectedOffice) {
             queryParams.office_id = selectedOffice;
@@ -68,7 +77,7 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
     tomorrow.setDate(today.getDate() + 1);
 
     return (
-        <AppHeaderLayout breadcrumbs={[]}>
+        <AppHeaderLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto py-8 ">
                 <h1 className="text-3xl font-bold mb-6">Make a Reservation</h1>
                 <div className="flex flex-col md:flex-row justify-evenly w-full gap-4 mb-8 p-6 border rounded-xl shadow-sm">

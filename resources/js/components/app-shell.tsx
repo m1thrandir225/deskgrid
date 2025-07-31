@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 interface AppShellProps {
     children: React.ReactNode;
-    variant?: 'header' | 'sidebar';
+    variant?: 'header' | 'sidebar'
 }
 
 export function AppShell({ children, variant = 'header' }: AppShellProps) {
