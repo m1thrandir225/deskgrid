@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { Desk, ReservationDesk } from '@/types/desk';
-import { ReservationWithUser } from '@/types/reservation';
+import { Reservation, ReservationWithUser } from '@/types/reservation';
 import { eachDayOfInterval, endOfWeek, format, isBefore, startOfToday, startOfWeek, isWeekend} from 'date-fns';
 import { router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
@@ -13,9 +13,10 @@ interface FloorViewerProps {
     desks: ReservationDesk[];
     selectedDate: Date;
     floor: Floor;
+    userReservation: Reservation | null;
 }
 
-const FloorViewer: React.FC<FloorViewerProps> = ({ desks, selectedDate, floor }) => {
+const FloorViewer: React.FC<FloorViewerProps> = ({ desks, selectedDate, floor, userReservation }) => {
     const { auth } = usePage<SharedData>().props;
     const [selectedDesk, setSelectedDesk] = React.useState<ReservationDesk | null>(null);
     const floorPlanRef = useRef<HTMLDivElement>(null);
@@ -82,6 +83,7 @@ const FloorViewer: React.FC<FloorViewerProps> = ({ desks, selectedDate, floor })
         router.delete(route('reservations.destroy', reservationId));
     };
 
+
     return (
         <div className="relative grid w-full grid-cols-3 rounded-lg border">
             <div ref={floorPlanRef} className="relative col-span-2 h-full w-auto bg-red-50 p-4">
@@ -101,10 +103,17 @@ const FloorViewer: React.FC<FloorViewerProps> = ({ desks, selectedDate, floor })
                         const position = relativeToAbsolute(desk.x_position, desk.y_position);
                         const isSelected = selectedDesk?.id === desk.id;
 
+                        const todaysReservationForUser = desk.reservations.find((reservation) => reservation.id === userReservation?.id);
                         return (
                             <div
                                 key={desk.id}
-                                onClick={() => setSelectedDesk(desk)}
+                                onClick={() => {
+                                    if(userReservation && todaysReservationForUser) {
+                                        setSelectedDesk(desk);
+                                    } else if (!userReservation) {
+                                        setSelectedDesk(desk);
+                                    }
+                                }}
                                 className={`absolute flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg border-2 text-xs font-bold transition-all select-none ${
                                     isSelected
                                         ? 'border-blue-700 bg-blue-500 text-white'
@@ -178,7 +187,6 @@ const FloorViewer: React.FC<FloorViewerProps> = ({ desks, selectedDate, floor })
                                                     variant={"default"}
                                                     size="sm"
                                                     onClick={() => handleReserveDesk(selectedDesk, date)}
-                                                    disabled={format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')}
                                                 >
                                                     <CalendarCheck />
                                                     Reserve

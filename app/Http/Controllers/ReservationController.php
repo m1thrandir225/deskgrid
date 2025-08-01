@@ -23,16 +23,15 @@ class ReservationController extends Controller
         $selectedOfficeId = $request->input('office_id');
         $selectedFloorId = $request->input('floor_id');
 
-        $reservationDate = $request->date('reservation_date');
-
-        if (!$reservationDate) {
-            $reservationDate = today();
-        }
-//        if($reservationDate->isAfter(today()->addDay())) {
-//            $reservationDate = today()->addDay();
-//        }
+        $reservationDate = today();
+        $userReservation = Reservation::query()
+            ->where("user_id", $request->user()->id)
+            ->where("reservation_date", $reservationDate->toDateString())
+            ->whereNotIn("status", [ReservationStatus::Cancelled])
+            ->first();
 
         $floors = collect();
+
         if($selectedOfficeId) {
             $floors = Floor::query()
                 ->where('office_id', $selectedOfficeId)
@@ -47,8 +46,9 @@ class ReservationController extends Controller
                 ->with(['reservations' => function ($query) use ($reservationDate) {
                     $query
                         ->where('reservation_date', $reservationDate->toDateString())
+                        ->whereNotIn("status", [ReservationStatus::Cancelled])
                         ->with("user:id,name,email")
-                    ->get();
+                        ->get();
                 }])
                 ->where('floor_id', $selectedFloorId)
                 ->get();
@@ -58,10 +58,10 @@ class ReservationController extends Controller
             "offices" => $offices,
             "floors" => $floors,
             "desks" => $desks,
+            "userReservation" => $userReservation,
             "filters" => [
                 "office_id" => $selectedOfficeId,
                 "floor_id" => $selectedFloorId,
-                "reservation_date" => $reservationDate->toDateString(),
             ]
         ]);
     }
@@ -84,6 +84,21 @@ class ReservationController extends Controller
         Gate::authorize('create', Reservation::class);
 
         $validated = $request->validated();
+        $today = now();
+
+        if($today->hour >= 9) {
+            return back()->withErrors("Reservations can only be made before 9am today.");
+        }
+
+        $existingReservation = Reservation::query()
+            ->where("user_id", $request->user()->id)
+            ->where("reservation_date", $today->toDateString())
+            ->whereNotIn("status", [ReservationStatus::Cancelled])
+            ->get();
+
+        if($existingReservation) {
+            return back()->withErrors("You already have a reservation for today. Please cancel your existing reservation before making a new one.");
+        }
 
         $reservation = Reservation::create([
             'desk_id' => $validated['desk_id'],
@@ -132,12 +147,14 @@ class ReservationController extends Controller
     /*
     * Handle a delete request
     */
-    public function delete(Reservation $reservation): RedirectResponse
+    public function destroy(Reservation $reservation): RedirectResponse
     {
         Gate::authorize('delete', $reservation);
 
+        $reservation->changeStatus(ReservationStatus::Cancelled);
+
         $reservation->delete();
 
-        return to_route('reservations.index')->with("message", "Reservation deleted.");
+        return to_route('reservations.index')->with("message", "Reservation cancelled.");
     }
 }

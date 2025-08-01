@@ -15,7 +15,6 @@ import { Menu, Search } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import {appMenues} from '@/constants/menu-items';
-import { useEffect } from 'react';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 

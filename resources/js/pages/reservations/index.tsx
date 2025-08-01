@@ -13,11 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import FloorViewer from '@/components/floor/viewer/floor-viewer';
 import { BreadcrumbItem } from '@/types';
 import { format } from 'date-fns';
+import { Reservation } from '@/types/reservation';
 
 interface PageProps {
     offices: Office[];
     floors: Floor[];
     desks: ReservationDesk[];
+    userReservation: Reservation | null;
     filters: {
         office_id?: string;
         floor_id?: string;
@@ -33,16 +35,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const ReservationsPage: React.FC<PageProps> = (props) => {
-    const { offices, filters, floors, desks } = props;
+    const { offices, filters, floors, desks, userReservation } = props;
 
     const [selectedOffice, setSelectedOffice] = useState(filters.office_id || '');
     const [selectedFloor, setSelectedFloor] = useState(filters.floor_id || '');
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(filters.reservation_date ? new Date(filters.reservation_date) : new Date());
-    const [dateDialogOpen, setDateDialogOpen] = useState<boolean>(false);
+
     useEffect(() => {
-        const queryParams: Record<string, string | undefined> = {
-            reservation_date: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : undefined
-        };
+        const queryParams: Record<string, string | undefined> = {};
+
         if (selectedOffice) {
             queryParams.office_id = selectedOffice;
         }
@@ -57,7 +57,7 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
                 preserveScroll: true,
             });
         }
-    }, [selectedOffice, selectedFloor, selectedDate]);
+    }, [selectedOffice, selectedFloor]);
 
     const handleOfficeChange = (value: string) => {
         const officeId = value
@@ -80,6 +80,14 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
         <AppHeaderLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto py-8 ">
                 <h1 className="text-3xl font-bold mb-6">Make a Reservation</h1>
+                {userReservation && (
+                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-blue-800">
+                            You have an active reservation for desk #{userReservation.desk_id} today.
+                            You can only cancel this reservation or select this desk again.
+                        </p>
+                    </div>
+                )}
                 <div className="flex flex-col md:flex-row justify-evenly w-full gap-4 mb-8 p-6 border rounded-xl shadow-sm">
                     {/* Office Selector */}
                     <div className="flex-1">
@@ -117,45 +125,14 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
                             </SelectContent>
                         </Select>
                     </div>
-
-                    {/* Date Picker */}
-                    <div className="flex-1 w-full">
-                        <Label htmlFor="office" className="block text-sm font-medium mb-1">Date</Label>
-                        <Popover open={dateDialogOpen} onOpenChange={setDateDialogOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    id="date"
-                                    className="w-48 justify-between font-normal"
-                                >
-                                    {selectedDate ? selectedDate.toLocaleDateString() : "Select date"}
-                                    <ChevronDownIcon />
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-                                <Calendar
-                                    mode="single"
-                                    disabled={{
-                                        before: today
-                                    }}
-
-                                    selected={selectedDate}
-                                    captionLayout="dropdown"
-                                    onSelect={(date) => {
-                                        setSelectedDate(date)
-                                        setDateDialogOpen(false)
-                                    }}
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    </div>
                 </div>
 
                 {desks && desks.length > 0 && selectedFloor ? (
                     <FloorViewer
                         desks={desks}
-                        selectedDate={selectedDate ?? new Date()}
+                        selectedDate={new Date()}
                         floor={floors.find(f => f.id.toString() === selectedFloor)!}
+                        userReservation={userReservation}
                     />
                 ) : (
                     <div className="text-center py-10 px-4 bg-gray-50 rounded-lg">
