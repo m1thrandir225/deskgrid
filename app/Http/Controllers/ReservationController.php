@@ -23,12 +23,10 @@ class ReservationController extends Controller
         $selectedOfficeId = $request->input('office_id');
         $selectedFloorId = $request->input('floor_id');
 
-        $reservationDate = today();
-        $userReservation = Reservation::query()
-            ->where("user_id", $request->user()->id)
-            ->where("reservation_date", $reservationDate->toDateString())
-            ->whereNotIn("status", [ReservationStatus::Cancelled])
-            ->first();
+
+        $startDate = $request->date('start_date') ?? now();
+        $endDate = $request->date('end_date') ?? $startDate->copy()->endOfWeek();
+
 
         $floors = collect();
 
@@ -43,9 +41,12 @@ class ReservationController extends Controller
         if($selectedFloorId) {
             $desks = Desk::query()
                 ->with("floor")
-                ->with(['reservations' => function ($query) use ($reservationDate) {
+                ->with(['reservations' => function ($query) use ($startDate, $endDate) {
                     $query
-                        ->where('reservation_date', $reservationDate->toDateString())
+                        ->whereBetween('reservation_date', [
+                            $startDate->toDateString(),
+                            $endDate->toDateString(),
+                        ])
                         ->whereNotIn("status", [ReservationStatus::Cancelled])
                         ->with("user:id,name,email")
                         ->get();
@@ -58,10 +59,12 @@ class ReservationController extends Controller
             "offices" => $offices,
             "floors" => $floors,
             "desks" => $desks,
-            "userReservation" => $userReservation,
             "filters" => [
                 "office_id" => $selectedOfficeId,
                 "floor_id" => $selectedFloorId,
+                "start_date" => $startDate->toDateString(),
+                "end_date" => $endDate->toDateString(),
+
             ]
         ]);
     }
@@ -86,7 +89,7 @@ class ReservationController extends Controller
         $validated = $request->validated();
         $today = now();
 
-        if($today->hour >= 9) {
+        if($today == $validated['reservation_date'] && $today->hour >= 9) {
             return back()->withErrors("Reservations can only be made before 9am today.");
         }
 
@@ -94,7 +97,7 @@ class ReservationController extends Controller
             ->where("user_id", $request->user()->id)
             ->where("reservation_date", $today->toDateString())
             ->whereNotIn("status", [ReservationStatus::Cancelled])
-            ->get();
+            ->first();
 
         if($existingReservation) {
             return back()->withErrors("You already have a reservation for today. Please cancel your existing reservation before making a new one.");

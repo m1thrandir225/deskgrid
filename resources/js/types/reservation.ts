@@ -9,7 +9,7 @@ export interface Reservation {
 export interface ReservationWithUser extends Reservation {
     user: {
         name: string;
-        id: string;
+        id: number;
         email: string;
     }
 }
