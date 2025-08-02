@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ReservationController extends Controller
 {
@@ -167,9 +168,7 @@ class ReservationController extends Controller
         $reservations = $request->user()
             ->reservations()
             ->with([
-                'desk:id,desk_number,floor_id',
-                'desk.floor:id,name,office_id',
-                'desk.floor.office:id,name'
+                'desk.floor.office',
             ])
             ->whereBetween('reservation_date', [
                 $startDate->toDateString(),
@@ -178,6 +177,11 @@ class ReservationController extends Controller
             ->whereNotIn('status', [ReservationStatus::Cancelled])
             ->orderBy('reservation_date')
             ->get();
+
+        $reservations->each(function ($reservation) {
+            $plan_image = $reservation->desk->floor()->first()->plan_image;
+            $reservation->desk->floor->plan_image_url = asset(Storage::url($plan_image));
+        });
 
         return Inertia::render("reservations/my-reservations", [
             "reservations" => $reservations,

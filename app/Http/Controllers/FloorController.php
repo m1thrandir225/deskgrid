@@ -6,17 +6,12 @@ use App\Http\Requests\Floor\CreateFloorRequest;
 use App\Http\Requests\Floor\UpdateFloorRequest;
 use App\Models\Floor;
 use App\Models\Office;
-use App\Services\Impl\StorageService;
-use App\Services\IStorageService;
-use Faker\Core\Uuid;
-use Faker\Provider\Uuid as ProviderUuid;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
-use Ramsey\Uuid\Uuid as UuidUuid;
 
 class FloorController extends Controller
 {

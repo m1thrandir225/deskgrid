@@ -1,3 +1,5 @@
+import { Desk, DeskWithFloor } from '@/types/desk';
+
 export interface Reservation {
     id: number;
     desk_id: number;
@@ -12,4 +14,8 @@ export interface ReservationWithUser extends Reservation {
         id: number;
         email: string;
     }
+}
+
+export interface ReservationWithDesk extends Reservation {
+    desk: DeskWithFloor
 }

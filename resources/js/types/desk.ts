@@ -1,4 +1,5 @@
 import { Reservation, ReservationWithUser } from '@/types/reservation';
+import { Floor, FloorWithOffice } from '@/types/floor';
 
 /**
  * Desk Model
@@ -11,6 +12,10 @@ export interface Desk {
     x_position: number;
     y_position: number;
     is_active: boolean;
+}
+
+export interface DeskWithFloor extends Desk {
+    floor: FloorWithOffice;
 }
 
 export interface ReservationDesk extends Desk {

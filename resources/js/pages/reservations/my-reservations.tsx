@@ -6,32 +6,18 @@ import { addDays, format, startOfWeek } from 'date-fns';
 import { Building, CalendarCheck, CircleOff, MapPin } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
+import { DeskWithFloor } from '@/types/desk';
+import { Reservation, ReservationWithDesk } from '@/types/reservation';
+import DeskLocationPopover from '@/components/desk/desk-location-popover';
 
 interface Filters {
     start_date?: string;
     end_date?: string;
 }
 
-interface MyReservation {
-    id: number;
-    reservation_date: string;
-    status: string;
-    desk: {
-        id: number;
-        desk_number: string;
-        floor: {
-            id: number;
-            name: string;
-            office: {
-                id: number;
-                name: string;
-            };
-        };
-    };
-}
 
 interface PageProps {
-    reservations: MyReservation[];
+    reservations: ReservationWithDesk[];
     filters: Filters;
 }
 
@@ -153,6 +139,7 @@ const MyReservationsPage: React.FC<PageProps> = (props) => {
                                                     <CalendarCheck size={18} />
                                                     <span className="font-medium">Reserved</span>
                                                 </div>
+                                                <DeskLocationPopover desk={reservation.desk} />
                                                 <Button variant="destructive" size="sm" onClick={() => handleCancelReservation(reservation.id)}>
                                                     <CircleOff size={16} />
                                                     Cancel
