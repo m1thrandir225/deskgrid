@@ -9,16 +9,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import FloorViewer from '@/components/floor/viewer/floor-viewer';
 import { BreadcrumbItem } from '@/types';
 import { endOfWeek, format, startOfWeek } from 'date-fns';
+import { FlashMessage } from '@/types/page';
+import { toast } from 'sonner';
+
+interface Filters {
+    office_id?: string;
+    floor_id?: string;
+    start_date?: string;
+    end_date?: string;
+}
 
 interface PageProps {
     offices: Office[];
     floors: Floor[];
     desks: ReservationDesk[];
-    filters: {
-        office_id?: string;
-        floor_id?: string;
-        reservation_date?: string;
-    };
+    filters: Filters;
+    flash: FlashMessage;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -29,76 +35,56 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const ReservationsPage: React.FC<PageProps> = (props) => {
-    const { offices, filters, floors, desks } = props;
+    const { offices, filters, floors, desks, flash} = props;
 
     const [selectedOffice, setSelectedOffice] = useState(filters.office_id || '');
     const [selectedFloor, setSelectedFloor] = useState(filters.floor_id || '');
-    const [selectedDate, setSelectedDate] = useState(new Date());
 
     useEffect(() => {
-        const queryParams: Record<string, string | undefined> = {};
+        if (selectedOffice && selectedFloor) {
+            const today = new Date();
+            const weekStart = startOfWeek(today, { weekStartsOn: 1 });
+            const weekEnd = endOfWeek(weekStart);
 
-        if (selectedOffice) {
-            queryParams.office_id = selectedOffice;
-        }
-        if (selectedFloor) {
-            queryParams.floor_id = selectedFloor;
-        }
-
-        const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(weekStart);
-
-        queryParams.start_date = format(weekStart, 'yyyy-MM-dd');
-        queryParams.end_date = format(weekEnd, 'yyyy-MM-dd');
-
-        if (selectedOffice) {
-            router.get(route('reservations.index'), queryParams, {
+            router.get(route('reservations.index'), {
+                office_id: selectedOffice,
+                floor_id: selectedFloor,
+                start_date: format(weekStart, 'yyyy-MM-dd'),
+                end_date: format(weekEnd, 'yyyy-MM-dd'),
+            }, {
                 preserveState: true,
                 replace: true,
                 preserveScroll: true,
             });
         }
-    }, [selectedOffice, selectedFloor, selectedDate]);
+    }, [selectedOffice, selectedFloor]);
+
+    useEffect(() => {
+        if(flash.message) {
+            toast(flash.message)
+        }
+        if(flash.error) {
+            toast.error(flash.error)
+        }
+    }, [flash])
+
 
     const handleOfficeChange = (value: string) => {
-        const officeId = value;
-        setSelectedOffice(officeId);
+        setSelectedOffice(value);
         setSelectedFloor('');
-        if (!officeId) {
-            router.get(route('reservations.index'));
-        }
-    };
 
-    const handleFloorChange = (newValue: string) => {
-        setSelectedFloor(newValue);
-    };
-
-    const handleWeekChange = (newDate: Date) => {
-        setSelectedDate(newDate);
-
-        // Get the week start and end dates
-        const weekStart = startOfWeek(newDate, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-
-        // Update the query parameters
-        const queryParams: Record<string, string | undefined> = {
-            office_id: selectedOffice,
-            floor_id: selectedFloor,
-            start_date: format(weekStart, 'yyyy-MM-dd'),
-            end_date: format(weekEnd, 'yyyy-MM-dd')
-        };
-
-        // Fetch new data for the selected week
-        router.get(route('reservations.index'), queryParams, {
+        // Load floors for the selected office
+        router.get(route('reservations.index'), {
+            office_id: value,
+        }, {
             preserveState: true,
             preserveScroll: true,
         });
     };
 
-
-    const today = new Date();
-    const tomorrow = new Date();
-    tomorrow.setDate(today.getDate() + 1);
+    const handleFloorChange = (newValue: string) => {
+        setSelectedFloor(newValue);
+    };
 
     return (
         <AppHeaderLayout breadcrumbs={breadcrumbs}>
@@ -147,15 +133,14 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
                 {desks && desks.length > 0 && selectedFloor ? (
                     <FloorViewer
                         desks={desks}
-                        selectedDate={selectedDate}
                         floor={floors.find((f) => f.id.toString() === selectedFloor)!}
-                        onDateChange={handleWeekChange}
                     />
                 ) : (
                     <div className="rounded-lg bg-gray-50 px-4 py-10 text-center">
                         <p className="text-gray-500">Please select an office and a floor to see available desks.</p>
                     </div>
                 )}
+
             </div>
         </AppHeaderLayout>
     );

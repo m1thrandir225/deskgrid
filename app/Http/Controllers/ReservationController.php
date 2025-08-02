@@ -90,7 +90,7 @@ class ReservationController extends Controller
         $today = now();
 
         if($today == $validated['reservation_date'] && $today->hour >= 9) {
-            return back()->withErrors("Reservations can only be made before 9am today.");
+            return back()->with("error", "Reservations can only be made before 9am today.");
         }
 
         $existingReservation = Reservation::query()
@@ -100,7 +100,7 @@ class ReservationController extends Controller
             ->first();
 
         if($existingReservation) {
-            return back()->withErrors("You already have a reservation for today. Please cancel your existing reservation before making a new one.");
+            return back()->with("error", "You already have a reservation for today. Please cancel your existing reservation before making a new one.");
         }
 
         $reservation = Reservation::create([
@@ -110,7 +110,7 @@ class ReservationController extends Controller
             'status' => ReservationStatus::Approved
         ]);
 
-        return to_route('reservations.index')->with('message', 'Reservation created successfully.');
+        return back()->with("message", "Reservation created successfully");
     }
 
     /**
@@ -156,8 +156,6 @@ class ReservationController extends Controller
 
         $reservation->changeStatus(ReservationStatus::Cancelled);
 
-        $reservation->delete();
-
-        return to_route('reservations.index')->with("message", "Reservation cancelled.");
+        return back()->with("message", "Reservation cancelled.");
     }
 }
