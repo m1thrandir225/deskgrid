@@ -1,9 +1,9 @@
 import OfficeForm, { OfficeFormProps } from '@/components/office/office-form';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
-import AdminLayout from '@/layouts/admin/layout';
 import { Office } from '@/types/office';
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useMemo } from 'react';
+import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     office: Office;
@@ -57,10 +57,10 @@ const UpdateOfficePage: React.FC<PageProps> = (props) => {
         onSubmit: handleSubmit,
     };
     return (
-        <AdminLayout title={`Editing ${office.name}`} breadcrumbs={breadcrumbs}>
+        <AppLayout title={`Editing ${office.name}`} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={`Editing: ${office.name}`} description="Edit the selected officd information " />
             <OfficeForm {...formProps} />
-        </AdminLayout>
+        </AppLayout>
     );
 };
 

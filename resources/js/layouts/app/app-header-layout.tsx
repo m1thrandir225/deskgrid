@@ -14,7 +14,6 @@ export default function AppHeaderLayout({ children, breadcrumbs }: AppHeaderLayo
         <AppShell>
             <AppHeader breadcrumbs={breadcrumbs} />
             <AppContent>{children}</AppContent>
-            <Toaster/>
         </AppShell>
     );
 }

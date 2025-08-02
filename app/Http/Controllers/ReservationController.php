@@ -158,4 +158,34 @@ class ReservationController extends Controller
 
         return back()->with("message", "Reservation cancelled.");
     }
+
+    public function myReservations(Request $request): Response
+    {
+        $startDate = $request->date('start_date') ?? now()->startOfWeek();
+        $endDate = $request->date('end_date') ?? $startDate->copy()->addDays(4); // Friday
+
+        $reservations = $request->user()
+            ->reservations()
+            ->with([
+                'desk:id,desk_number,floor_id',
+                'desk.floor:id,name,office_id',
+                'desk.floor.office:id,name'
+            ])
+            ->whereBetween('reservation_date', [
+                $startDate->toDateString(),
+                $endDate->toDateString(),
+            ])
+            ->whereNotIn('status', [ReservationStatus::Cancelled])
+            ->orderBy('reservation_date')
+            ->get();
+
+        return Inertia::render("reservations/my-reservations", [
+            "reservations" => $reservations,
+            "filters" => [
+                "start_date" => $startDate->toDateString(),
+                "end_date" => $endDate->toDateString(),
+            ]
+        ]);
+
+    }
 }

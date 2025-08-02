@@ -1,10 +1,10 @@
 import React, { FormEventHandler, useMemo } from 'react';
 import { BreadcrumbItem } from '@/types';
 import { Employee } from '@/types/employee';
-import AdminLayout from '@/layouts/admin/layout';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import EmployeeForm from '@/components/employees/employee-form';
 import { useForm } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     employee: Employee
@@ -42,7 +42,7 @@ const EmployeeEditPage: React.FC<PageProps> = (props) => {
         e.preventDefault()
     }
     return (
-        <AdminLayout title={"Edit Employee"} breadcrumbs={breadcrumbs}>
+        <AppLayout title={"Edit Employee"} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={`Editing: ${employee.name}`} description={`Edit details about the employee`}/>
             <EmployeeForm
                 mode={"Edit"}
@@ -54,7 +54,7 @@ const EmployeeEditPage: React.FC<PageProps> = (props) => {
                 errors={errors}
                 onSubmit={handleSubmit}
             />
-        </AdminLayout>
+        </AppLayout>
     )
 }
 

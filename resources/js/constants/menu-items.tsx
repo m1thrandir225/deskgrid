@@ -4,14 +4,14 @@ import { BookOpen, BuildingIcon, CalendarFold, Folder, LayoutGrid, NotebookPen, 
 const appMenues = {
     mainNavItems: [
         {
+            title: 'My Reservations',
+            url: '/my-reservations',
+            icon: NotebookPen,
+        },
+        {
             title: 'Reserve',
             url: '/reservations',
             icon: CalendarFold,
-        },
-        {
-            title: 'My Reservations',
-            url: '/reservations/me',
-            icon: NotebookPen,
         },
     ],
     rightNavItems: [

@@ -1,11 +1,11 @@
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import OfficeListItem from '@/components/office/office-list-item';
 import { Button } from '@/components/ui/button';
-import AdminLayout from '@/layouts/admin/layout';
 import { BreadcrumbItem } from '@/types';
 import { type Office } from '@/types/office';
 import { Link } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
+import AppLayout from '@/layouts/app-layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,7 +20,7 @@ interface PageProps {
 
 export default function Index({ offices }: PageProps) {
     return (
-        <AdminLayout title="Offices" breadcrumbs={breadcrumbs}>
+        <AppLayout title="Offices" breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title="Offices" description="Manage your offices">
                 <Button asChild size={'icon'} variant={'outline'}>
                     <Link href="/offices/create">
@@ -33,6 +33,6 @@ export default function Index({ offices }: PageProps) {
                     <OfficeListItem office={office} key={office.id} />
                 ))}
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 }

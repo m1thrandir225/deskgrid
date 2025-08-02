@@ -1,12 +1,12 @@
 import { Floor } from '@/types/floor';
 import { Office } from '@/types/office';
 import { BreadcrumbItem } from '@/types';
-import AdminLayout from '@/layouts/admin/layout';
 import React, { FormEventHandler, useMemo } from 'react';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import FloorForm, { FloorFormProps } from '@/components/floor/floor-form';
 import { useForm } from '@inertiajs/react';
 import { router } from '@inertiajs/react'
+import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     floor: Floor;
@@ -80,10 +80,10 @@ const FloorEditPage: React.FC<PageProps> = (props) => {
         setInput: (newValue, field) => setData(field, newValue)
     };
     return (
-        <AdminLayout title={floor.name} breadcrumbs={breadcrumbs}>
+        <AppLayout title={floor.name} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={`Editing: ${floor.name}`} description={"Update the floor details"} />
             <FloorForm {...formProps} />
-        </AdminLayout>
+        </AppLayout>
     )
 }
 export default FloorEditPage;

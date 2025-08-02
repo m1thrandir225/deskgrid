@@ -4,6 +4,7 @@ import React, { FormEventHandler, useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import EmployeeForm from '@/components/employees/employee-form';
 import { BreadcrumbItem } from '@/types';
+import AppLayout from '@/layouts/app-layout';
 
 export type CreateEmployeeForm = {
     first_name: string;
@@ -40,7 +41,7 @@ const EmployeeCreatePage: React.FC = () => {
         })
     }
     return (
-        <AdminLayout title={"Create Employee"} breadcrumbs={breadcrumbs}>
+        <AppLayout title={"Create Employee"} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={"Invite an Employee"} description={"Add a new employee for your organization"}>
 
             </OfficeLayoutHeader>
@@ -54,7 +55,7 @@ const EmployeeCreatePage: React.FC = () => {
                 isLoading={processing}
                 onSubmit={handleSubmit}
             />
-        </AdminLayout>
+        </AppLayout>
     )
 }
 

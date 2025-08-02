@@ -1,6 +1,5 @@
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
-import AdminLayout from '@/layouts/admin/layout';
 import { BreadcrumbItem } from '@/types';
 import { Floor } from '@/types/floor';
 import { Office } from '@/types/office';
@@ -8,6 +7,7 @@ import { Link, useForm } from '@inertiajs/react';
 import { Edit2, Trash } from 'lucide-react';
 import { FormEventHandler, useMemo } from 'react';
 import FloorPlanEditor from '@/components/floor/plan-editor/plan-editor';
+import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     floor: Floor;
@@ -46,7 +46,7 @@ const FloorDetailsPage: React.FC<PageProps> = (props) => {
     };
 
     return (
-        <AdminLayout title={floor.name} breadcrumbs={breadcrumbs}>
+        <AppLayout title={floor.name} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={floor.name} description={`Details about: ${floor.name}`}>
                 <Button asChild variant="outline" size="icon">
                     <Link href={`/offices/${office.id}/floors/${floor.id}/edit`}>
@@ -60,7 +60,7 @@ const FloorDetailsPage: React.FC<PageProps> = (props) => {
                 </form>
             </OfficeLayoutHeader>
             <FloorPlanEditor office={office} floor={floor} />
-        </AdminLayout>
+        </AppLayout>
     );
 };
 

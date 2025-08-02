@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        $redirectPath = ($user->role === UserRole::Admin) ? 'dashboard' : 'reservations.index';
+        $redirectPath = ($user->role === UserRole::Admin) ? 'dashboard' : 'reservations.my';
 
         return redirect()->intended(route($redirectPath, absolute: false));
     }

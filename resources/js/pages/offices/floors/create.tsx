@@ -1,10 +1,10 @@
 import FloorForm, { FloorFormProps } from '@/components/floor/floor-form';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
-import AdminLayout from '@/layouts/admin/layout';
 import { BreadcrumbItem } from '@/types';
 import { Office } from '@/types/office';
 import { useForm } from '@inertiajs/react';
 import React, { FormEventHandler, useMemo } from 'react';
+import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     office: Office;
@@ -68,10 +68,10 @@ const CreateFloorPage: React.FC<PageProps> = (props) => {
         setInput: (newValue, field) => setData(field, newValue),
     };
     return (
-        <AdminLayout title={'Create a floor'} breadcrumbs={breadcrumbs}>
+        <AppLayout title={'Create a floor'} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title="Create a floor" description={`Create a floor for: ${office.name}`} />
             <FloorForm {...formProps} />
-        </AdminLayout>
+        </AppLayout>
     );
 };
 

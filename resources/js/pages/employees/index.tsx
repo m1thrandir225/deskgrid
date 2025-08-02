@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from 'react';
-import AdminLayout from '@/layouts/admin/layout';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
 import { Link } from '@inertiajs/react';
@@ -9,6 +8,7 @@ import EmployeeTable from '@/components/employees/employee-table';
 import { toast } from 'sonner';
 import { FlashMessage } from '@/types/page';
 import { BreadcrumbItem } from '@/types';
+import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     employees: Employee[];
@@ -36,7 +36,7 @@ const EmployeesPage: React.FC<PageProps> = (props) => {
         }
     }, [flash])
     return (
-        <AdminLayout title={"Employees"} breadcrumbs={breadcrumbs}>
+        <AppLayout title={"Employees"} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={"Employees"} description={"Manage your organizations employees"}>
                 <Button asChild variant={"outline"}>
                     <Link href={"/employees/create"}>
@@ -52,7 +52,7 @@ const EmployeesPage: React.FC<PageProps> = (props) => {
                 </Button>
         </OfficeLayoutHeader>
             <EmployeeTable employees={employees} />
-        </AdminLayout>
+        </AppLayout>
     )
 }
 

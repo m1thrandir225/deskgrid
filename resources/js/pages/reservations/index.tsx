@@ -4,13 +4,13 @@ import { Floor } from '@/types/floor';
 import { ReservationDesk } from '@/types/desk';
 import { router } from '@inertiajs/react';
 import { Label } from '@/components/ui/label';
-import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import FloorViewer from '@/components/floor/viewer/floor-viewer';
 import { BreadcrumbItem } from '@/types';
 import { endOfWeek, format, startOfWeek } from 'date-fns';
 import { FlashMessage } from '@/types/page';
 import { toast } from 'sonner';
+import AppLayout from '@/layouts/app-layout';
 
 interface Filters {
     office_id?: string;
@@ -87,7 +87,7 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
     };
 
     return (
-        <AppHeaderLayout breadcrumbs={breadcrumbs}>
+        <AppLayout title={"Reserve a desk"} breadcrumbs={breadcrumbs}>
             <div className="container mx-auto py-8">
                 <h1 className="mb-6 text-3xl font-bold">Make a Reservation</h1>
                 <div className="mb-8 flex w-full flex-col justify-evenly gap-4 rounded-xl border p-6 shadow-sm md:flex-row">
@@ -142,7 +142,7 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
                 )}
 
             </div>
-        </AppHeaderLayout>
+        </AppLayout>
     );
 };
 

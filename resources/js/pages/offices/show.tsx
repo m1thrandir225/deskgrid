@@ -1,11 +1,11 @@
 import FloorTable from '@/components/floor/floor-table';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
-import AdminLayout from '@/layouts/admin/layout';
 import type { Office } from '@/types/office';
 import { Link, useForm } from '@inertiajs/react';
 import { Edit2, Plus, TrashIcon } from 'lucide-react';
 import React, { FormEventHandler, useMemo } from 'react';
+import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     office: Office;
@@ -39,7 +39,7 @@ const OfficeShowPage: React.FC<PageProps> = (props) => {
     };
 
     return (
-        <AdminLayout title={`${office.name} Details`} breadcrumbs={breadcrumbs}>
+        <AppLayout title={`${office.name} Details`} breadcrumbs={breadcrumbs}>
             <OfficeLayoutHeader title={office.name} description={office.address}>
                 <Button asChild size={'icon'} variant={'outline'}>
                     <Link href={`/offices/${office.id}/edit`}>
@@ -67,7 +67,7 @@ const OfficeShowPage: React.FC<PageProps> = (props) => {
                     <p>Please create a floor to see it show up here.</p>
                 )}
             </div>
-        </AdminLayout>
+        </AppLayout>
     );
 };
 
