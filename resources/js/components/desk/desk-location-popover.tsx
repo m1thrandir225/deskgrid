@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -12,7 +12,6 @@ const DeskLocationPopover: React.FC<ComponentProps> = ({ desk }) => {
     const [imageLoaded, setImageLoaded] = React.useState(false);
     const imageRef = React.useRef<HTMLImageElement>(null);
 
-    // Fixed container dimensions
     const CONTAINER_WIDTH = 300;
     const CONTAINER_HEIGHT = 250;
 
@@ -20,7 +19,6 @@ const DeskLocationPopover: React.FC<ComponentProps> = ({ desk }) => {
         setImageLoaded(true);
     };
 
-    // Convert relative position (0-1) to absolute pixel position within our fixed container
     const relativeToAbsolute = (relativeX: number, relativeY: number) => {
         return {
             x: relativeX * CONTAINER_WIDTH,
