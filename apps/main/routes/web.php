@@ -1,10 +1,17 @@
 <?php
 
+use App\Enums\UserRole;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    $hasUsers = User::where('role', UserRole::Admin)->exists();
+    if ($hasUsers) {
+        return redirect()->route("login");
+    } else {
+        return redirect()->route("register");
+    }
 })->name('home');
 
 Route::middleware(['auth', 'verified', "admin"])->group(function () {
