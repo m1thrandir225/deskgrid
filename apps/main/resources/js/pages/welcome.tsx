@@ -1,4 +1,4 @@
-import { type SharedData } from '@/types';
+import { type SharedData } from '../types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 import { CalendarCheck, Github, ExternalLink, Building, Users } from 'lucide-react';
