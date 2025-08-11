@@ -22,10 +22,19 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface DemoData {
+    enabled: boolean;
+    adminEmail: string;
+    userEmail: string;
+    password: string;
+    maxUsers: number;
+}
+
 export interface SharedData {
     name: string;
     auth: Auth;
     flash: FlashMessage;
+    demo?: DemoData
     [key: string]: unknown;
 }
 

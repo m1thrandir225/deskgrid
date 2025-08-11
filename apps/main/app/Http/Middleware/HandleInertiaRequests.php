@@ -45,7 +45,22 @@ class HandleInertiaRequests extends Middleware
             "flash" => [
                 "message" => fn () => $request->session()->get("message"),
                 "error" => fn () => $request->session()->get("error")
-            ]
+            ],
+            "demo" => $this->getDemoConfig()
+        ];
+    }
+
+    private function getDemoConfig(): ?array {
+        if (!config("demo.enabled")) {
+            return null;
+        }
+
+        return [
+            'enabled' => true,
+            'adminEmail' => config("demo.admin_email"),
+            "userEmail" => config("demo.user_email"),
+            "password" => config("demo.password"),
+            "maxUsers" => config("demo.max_users")
         ];
     }
 }
