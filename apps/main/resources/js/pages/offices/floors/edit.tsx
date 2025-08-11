@@ -1,12 +1,11 @@
+import FloorForm, { FloorFormProps } from '@/components/floor/floor-form';
+import OfficeLayoutHeader from '@/components/office/office-layout-header';
+import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
 import { Floor } from '@/types/floor';
 import { Office } from '@/types/office';
-import { BreadcrumbItem } from '@/types';
+import { router, useForm } from '@inertiajs/react';
 import React, { FormEventHandler, useMemo } from 'react';
-import OfficeLayoutHeader from '@/components/office/office-layout-header';
-import FloorForm, { FloorFormProps } from '@/components/floor/floor-form';
-import { useForm } from '@inertiajs/react';
-import { router } from '@inertiajs/react'
-import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     floor: Floor;
@@ -17,24 +16,24 @@ type EditFloorForm = {
     name: string;
     plan_image: File | null;
     office_id: number;
-}
+};
 
 const FloorEditPage: React.FC<PageProps> = (props) => {
     const { floor, office } = props;
 
-    const breadcrumbs = useMemo<BreadcrumbItem[]>(()  => {
+    const breadcrumbs = useMemo<BreadcrumbItem[]>(() => {
         return [
             {
-                title: "Offices",
-                href: "/offices",
+                title: 'Offices',
+                href: '/offices',
             },
             {
                 title: office.name,
                 href: `/offices/${office.id}`,
             },
             {
-                title: "Floors",
-                href: null
+                title: 'Floors',
+                href: `/offices/${office.id}`,
             },
             {
                 title: floor.name,
@@ -43,15 +42,15 @@ const FloorEditPage: React.FC<PageProps> = (props) => {
             {
                 title: `Edit`,
                 href: `/offices/${office.id}/floors/${floor.id}/edit`,
-            }
+            },
         ] as BreadcrumbItem[];
-    }, [floor, office])
+    }, [floor, office]);
 
     const { data, setData, processing, errors } = useForm<EditFloorForm>({
         name: floor.name,
         plan_image: null,
-        office_id: office.id
-    })
+        office_id: office.id,
+    });
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -62,13 +61,13 @@ const FloorEditPage: React.FC<PageProps> = (props) => {
         }
         formData.append('_method', 'PATCH');
 
-        router.post(route("offices.floors.update", [office.id, floor.id]), formData, {
+        router.post(route('offices.floors.update', [office.id, floor.id]), formData, {
             forceFormData: true,
             onError: (errors) => {
                 console.log(errors);
-            }
+            },
         });
-    }
+    };
     const formProps: FloorFormProps = {
         nameValue: data.name,
         planImageValue: data.plan_image,
@@ -77,13 +76,13 @@ const FloorEditPage: React.FC<PageProps> = (props) => {
         officeIdValue: office.id,
         planImageUrl: floor.plan_image_url ?? null,
         errors: errors,
-        setInput: (newValue, field) => setData(field, newValue)
+        setInput: (newValue, field) => setData(field, newValue),
     };
     return (
         <AppLayout title={floor.name} breadcrumbs={breadcrumbs}>
-            <OfficeLayoutHeader title={`Editing: ${floor.name}`} description={"Update the floor details"} />
+            <OfficeLayoutHeader title={`Editing: ${floor.name}`} description={'Update the floor details'} />
             <FloorForm {...formProps} />
         </AppLayout>
-    )
-}
+    );
+};
 export default FloorEditPage;

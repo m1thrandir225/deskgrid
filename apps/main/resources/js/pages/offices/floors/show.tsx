@@ -1,13 +1,13 @@
+import FloorPlanEditor from '@/components/floor/plan-editor/plan-editor';
 import OfficeLayoutHeader from '@/components/office/office-layout-header';
 import { Button } from '@/components/ui/button';
+import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Floor } from '@/types/floor';
 import { Office } from '@/types/office';
 import { Link, useForm } from '@inertiajs/react';
 import { Edit2, Trash } from 'lucide-react';
 import { FormEventHandler, useMemo } from 'react';
-import FloorPlanEditor from '@/components/floor/plan-editor/plan-editor';
-import AppLayout from '@/layouts/app-layout';
 
 interface PageProps {
     floor: Floor;
@@ -29,7 +29,7 @@ const FloorDetailsPage: React.FC<PageProps> = (props) => {
             },
             {
                 title: 'Floors',
-                href: null,
+                href: `/offices/${office.id}`,
             },
             {
                 title: floor.name,

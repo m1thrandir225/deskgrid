@@ -37,7 +37,7 @@ class DemoRestrictions
 
     private function blockDestructiveActions(Request $request)
     {
-        $blockedRoutes = ['users.destroy', 'settings.reset'];
+        $blockedRoutes = ['users.destroy', 'settings.reset', 'desks.destroy', 'offices.destroy', 'offices.update', 'offices.store', 'offices.create', 'offices.floors.destroy', 'offices.floors.update', 'offices.floors.store', 'offices.floors.create', 'employees.destroy', 'employees.edit', 'employees.update', 'employees.store', 'employees.create', 'employees.import', 'employees.storeMultiple'];
 
         if ($request->routeIs($blockedRoutes)) {
             throw new \Exception("This action is not allowed in demo mode");

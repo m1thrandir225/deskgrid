@@ -38,7 +38,7 @@ class FloorController extends Controller
     {
         Gate::authorize('create', Floor::class);
 
-        $validated = $request -> validated();
+        $validated = $request->validated();
 
         $filePath = $request->file('plan_image')->store('floor_plans');
 
@@ -55,7 +55,11 @@ class FloorController extends Controller
         Gate::authorize('view', $floor);
         $floor->load('desks');
 
-        $floor->plan_image_url = asset(Storage::url($floor->plan_image));
+        if (config('demo.enabled')) {
+            $floor->plan_image_url = asset($floor->plan_image);
+        } else {
+            $floor->plan_image_url = Storage::url($floor->plan_image);
+        }
 
         return Inertia::render('offices/floors/show', [
             "floor" => $floor,
@@ -65,9 +69,14 @@ class FloorController extends Controller
 
     public function edit(Office $office, Floor $floor): Response
     {
+
         Gate::authorize('update', $floor);
 
-        $floor["plan_image_url"] = Storage::url($floor["plan_image"]);
+        if (config('demo.enabled')) {
+            $floor["plan_image_url"] = asset($floor["plan_image"]);
+        } else {
+            $floor["plan_image_url"] = Storage::url($floor["plan_image"]);
+        }
 
         return Inertia::render('offices/floors/edit', [
             "office" => $office,
@@ -75,7 +84,7 @@ class FloorController extends Controller
         ]);
     }
 
-    public function update(UpdateFloorRequest $request, Office $office ,Floor $floor): RedirectResponse
+    public function update(UpdateFloorRequest $request, Office $office, Floor $floor): RedirectResponse
     {
         //Gate::authorize('update', $floor);
         $validated = $request->validated();
@@ -83,7 +92,7 @@ class FloorController extends Controller
             'name' => $validated['name'],
         ];
 
-        if($request->hasFile("plan_image")) {
+        if ($request->hasFile("plan_image")) {
             Storage::delete($floor->plan_image);
             $filePath = $request->file('plan_image')->store('floor_plans');
             $dataToUpdate["plan_image"] = $filePath;

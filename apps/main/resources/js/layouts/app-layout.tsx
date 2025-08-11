@@ -15,6 +15,10 @@ interface AppLayoutProps {
 export default function AppLayout({ children, breadcrumbs = [], title }: AppLayoutProps) {
     const { auth, demo } = usePage<SharedData>().props;
 
+    if (!auth || !auth.user) {
+        // Optionally render a fallback or redirect
+        return <div>Loading...</div>;
+    }
     const isAdmin = auth.user.role === 'admin';
 
     return isAdmin ? (

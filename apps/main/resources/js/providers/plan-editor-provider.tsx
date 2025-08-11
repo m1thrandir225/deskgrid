@@ -1,21 +1,16 @@
-import { Office } from '@/types/office';
-import { Floor } from '@/types/floor';
 import FloorPlanEditorContext from '@/contexts/plan-editor-context';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Desk, EditorDesk } from '@/types/desk';
+import { EditorDesk } from '@/types/desk';
+import { Floor } from '@/types/floor';
+import { Office } from '@/types/office';
 import { router } from '@inertiajs/react';
-
-interface PageProps {
-    floor: Floor,
-    office: Office
-}
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface HistoryState {
     desks: EditorDesk[];
     nextClientId: number;
 }
 
-const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
+const useFloorPlanEditorState = (props: { floor: Floor; office: Office }) => {
     const { floor, office } = props;
 
     const [editorDesks, setEditorDesks] = useState<EditorDesk[]>([]);
@@ -34,16 +29,15 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
     const imageRef = useRef<HTMLImageElement>(null);
 
     const visibleDesks = useMemo(() => {
-        return editorDesks.filter(desk => desk.status !== "deleted")
-    }, [editorDesks])
-
+        return editorDesks.filter((desk) => desk.status !== 'deleted');
+    }, [editorDesks]);
 
     useEffect(() => {
         if (floor.desks) {
-            const initialDesks: EditorDesk[] = floor.desks.map(desk => ({
+            const initialDesks: EditorDesk[] = floor.desks.map((desk) => ({
                 ...desk,
                 clientId: desk.id || nextClientId,
-                status: 'initial'
+                status: 'initial',
             }));
 
             const initialNextClientId = nextClientId + floor.desks.length;
@@ -54,38 +48,41 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
             // Create initial history state
             const initialState: HistoryState = {
                 desks: JSON.parse(JSON.stringify(initialDesks)), // Deep copy
-                nextClientId: initialNextClientId
+                nextClientId: initialNextClientId,
             };
             setHistory([initialState]);
             setHistoryIndex(0);
         }
     }, [floor]);
 
-    const saveToHistory = useCallback((desks: EditorDesk[], nextId: number) => {
-        if (isUpdatingFromHistory) return;
+    const saveToHistory = useCallback(
+        (desks: EditorDesk[], nextId: number) => {
+            if (isUpdatingFromHistory) return;
 
-        const newState: HistoryState = {
-            desks: JSON.parse(JSON.stringify(desks)), // Deep copy
-            nextClientId: nextId
-        };
+            const newState: HistoryState = {
+                desks: JSON.parse(JSON.stringify(desks)), // Deep copy
+                nextClientId: nextId,
+            };
 
-        setHistory(prev => {
-            const newHistory = prev.slice(0, historyIndex + 1);
-            newHistory.push(newState);
+            setHistory((prev) => {
+                const newHistory = prev.slice(0, historyIndex + 1);
+                newHistory.push(newState);
 
-            if (newHistory.length > 50) {
-                newHistory.shift();
+                if (newHistory.length > 50) {
+                    newHistory.shift();
+                    return newHistory;
+                }
+
                 return newHistory;
-            }
+            });
 
-            return newHistory;
-        });
-
-        setHistoryIndex(prev => {
-            const newIndex = prev + 1;
-            return newIndex >= 50 ? 49 : newIndex;
-        });
-    }, [historyIndex, isUpdatingFromHistory]);
+            setHistoryIndex((prev) => {
+                const newIndex = prev + 1;
+                return newIndex >= 50 ? 49 : newIndex;
+            });
+        },
+        [historyIndex, isUpdatingFromHistory],
+    );
 
     // Undo function
     const undo = useCallback(() => {
@@ -127,8 +124,7 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
             if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {
                 e.preventDefault();
                 undo();
-            } else if (((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Z') ||
-                ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
+            } else if (((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Z') || ((e.ctrlKey || e.metaKey) && e.key === 'y')) {
                 e.preventDefault();
                 redo();
             }
@@ -143,30 +139,36 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         if (imageRef.current) {
             setFloorPlanDimensions({
                 width: imageRef.current.clientWidth,
-                height: imageRef.current.clientHeight
+                height: imageRef.current.clientHeight,
             });
         }
     }, []);
 
     // Convert relative position (0-1) to absolute pixels
-    const relativeToAbsolute = useCallback((relativeX: number, relativeY: number) => {
-        return {
-            x: relativeX * floorPlanDimensions.width,
-            y: relativeY * floorPlanDimensions.height
-        };
-    }, [floorPlanDimensions]);
+    const relativeToAbsolute = useCallback(
+        (relativeX: number, relativeY: number) => {
+            return {
+                x: relativeX * floorPlanDimensions.width,
+                y: relativeY * floorPlanDimensions.height,
+            };
+        },
+        [floorPlanDimensions],
+    );
 
     // Convert absolute pixels to relative position (0-1)
-    const absoluteToRelative = useCallback((absoluteX: number, absoluteY: number) => {
-        return {
-            x: floorPlanDimensions.width > 0 ? absoluteX / floorPlanDimensions.width : 0,
-            y: floorPlanDimensions.height > 0 ? absoluteY / floorPlanDimensions.height : 0
-        };
-    }, [floorPlanDimensions]);
+    const absoluteToRelative = useCallback(
+        (absoluteX: number, absoluteY: number) => {
+            return {
+                x: floorPlanDimensions.width > 0 ? absoluteX / floorPlanDimensions.width : 0,
+                y: floorPlanDimensions.height > 0 ? absoluteY / floorPlanDimensions.height : 0,
+            };
+        },
+        [floorPlanDimensions],
+    );
 
     // Add a new desk
     const addDesk = useCallback(() => {
-        const visibleDesks = editorDesks.filter(desk => desk.status !== 'deleted');
+        const visibleDesks = editorDesks.filter((desk) => desk.status !== 'deleted');
         const newDeskNumber = visibleDesks.length + 1;
 
         const newDesk: EditorDesk = {
@@ -177,7 +179,7 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
             x_position: 0.1, // 10% from left edge
             y_position: 0.1, // 10% from top edge
             is_active: true,
-            status: 'new'
+            status: 'new',
         };
 
         const newDesks = [...editorDesks, newDesk];
@@ -192,12 +194,12 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
 
     // Recalculate desk numbers to ensure sequential numbering
     const recalculateDeskNumbers = useCallback((desks: EditorDesk[]) => {
-        const visibleDesks = desks.filter(desk => desk.status !== 'deleted');
-        return desks.map(desk => {
+        const visibleDesks = desks.filter((desk) => desk.status !== 'deleted');
+        return desks.map((desk) => {
             if (desk.status === 'deleted') return desk;
 
             // Find the position of this desk among visible desks
-            const visibleIndex = visibleDesks.findIndex(d => d.clientId === desk.clientId);
+            const visibleIndex = visibleDesks.findIndex((d) => d.clientId === desk.clientId);
             const newDeskNumber = visibleIndex + 1;
 
             if (desk.desk_number !== newDeskNumber) {
@@ -213,79 +215,80 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
     }, []);
 
     // Delete a desk
-    const deleteDesk = useCallback((clientId: number) => {
-        const deskToDelete = editorDesks.find(desk => desk.clientId === clientId);
+    const deleteDesk = useCallback(
+        (clientId: number) => {
+            const deskToDelete = editorDesks.find((desk) => desk.clientId === clientId);
 
-        let newDesks: EditorDesk[];
+            let newDesks: EditorDesk[];
 
-        if (deskToDelete?.status === 'new') {
-            // If it's a new desk, simply remove it from the list
-            newDesks = editorDesks.filter(desk => desk.clientId !== clientId);
-        } else {
-            // If it's an existing desk (initial/updated), mark it as deleted
-            newDesks = editorDesks.map(desk =>
-                desk.clientId === clientId
-                    ? { ...desk, status: 'deleted' as const }
-                    : desk
-            );
-        }
+            if (deskToDelete?.status === 'new') {
+                // If it's a new desk, simply remove it from the list
+                newDesks = editorDesks.filter((desk) => desk.clientId !== clientId);
+            } else {
+                // If it's an existing desk (initial/updated), mark it as deleted
+                newDesks = editorDesks.map((desk) => (desk.clientId === clientId ? { ...desk, status: 'deleted' as const } : desk));
+            }
 
-        // Recalculate desk numbers after deletion
-        newDesks = recalculateDeskNumbers(newDesks);
+            // Recalculate desk numbers after deletion
+            newDesks = recalculateDeskNumbers(newDesks);
 
-        setEditorDesks(newDesks);
-        setSelectedDeskId(null);
+            setEditorDesks(newDesks);
+            setSelectedDeskId(null);
 
-        // Save to history
-        saveToHistory(newDesks, nextClientId);
-    }, [editorDesks, nextClientId, saveToHistory, recalculateDeskNumbers]);
+            // Save to history
+            saveToHistory(newDesks, nextClientId);
+        },
+        [editorDesks, nextClientId, saveToHistory, recalculateDeskNumbers],
+    );
 
-    const handleMouseDown = useCallback((e: React.MouseEvent, desk: EditorDesk) => {
-        e.preventDefault();
+    const handleMouseDown = useCallback(
+        (e: React.MouseEvent, desk: EditorDesk) => {
+            e.preventDefault();
 
-        setSelectedDeskId(desk.clientId);
-        setIsDragging(true);
+            setSelectedDeskId(desk.clientId);
+            setIsDragging(true);
 
-        const rect = floorPlanRef.current?.getBoundingClientRect();
-        const absolutePos = relativeToAbsolute(desk.x_position, desk.y_position);
+            const rect = floorPlanRef.current?.getBoundingClientRect();
+            const absolutePos = relativeToAbsolute(desk.x_position, desk.y_position);
 
-        if (rect) {
-            setDragOffset({
-                x: e.clientX - rect.left - absolutePos.x,
-                y: e.clientY - rect.top - absolutePos.y
-            });
-        }
-    }, [relativeToAbsolute]);
+            if (rect) {
+                setDragOffset({
+                    x: e.clientX - rect.left - absolutePos.x,
+                    y: e.clientY - rect.top - absolutePos.y,
+                });
+            }
+        },
+        [relativeToAbsolute],
+    );
 
     // Handle mouse move (dragging)
-    const handleMouseMove = useCallback((e: React.MouseEvent) => {
-        if (!isDragging || selectedDeskId === null) return;
+    const handleMouseMove = useCallback(
+        (e: React.MouseEvent) => {
+            if (!isDragging || selectedDeskId === null) return;
 
-        const rect = floorPlanRef.current?.getBoundingClientRect();
-        if (!rect) return;
+            const rect = floorPlanRef.current?.getBoundingClientRect();
+            if (!rect) return;
 
-        const absoluteX = Math.max(0, Math.min(
-            floorPlanDimensions.width - 40,
-            e.clientX - rect.left - dragOffset.x
-        ));
-        const absoluteY = Math.max(0, Math.min(
-            floorPlanDimensions.height - 40,
-            e.clientY - rect.top - dragOffset.y
-        ));
+            const absoluteX = Math.max(0, Math.min(floorPlanDimensions.width - 40, e.clientX - rect.left - dragOffset.x));
+            const absoluteY = Math.max(0, Math.min(floorPlanDimensions.height - 40, e.clientY - rect.top - dragOffset.y));
 
-        const relativePos = absoluteToRelative(absoluteX, absoluteY);
+            const relativePos = absoluteToRelative(absoluteX, absoluteY);
 
-        setEditorDesks(prev => prev.map(desk =>
-            desk.clientId === selectedDeskId
-                ? {
-                    ...desk,
-                    x_position: relativePos.x,
-                    y_position: relativePos.y,
-                    status: desk.status === 'initial' ? 'updated' : desk.status
-                }
-                : desk
-        ));
-    }, [isDragging, selectedDeskId, dragOffset, floorPlanDimensions, absoluteToRelative]);
+            setEditorDesks((prev) =>
+                prev.map((desk) =>
+                    desk.clientId === selectedDeskId
+                        ? {
+                              ...desk,
+                              x_position: relativePos.x,
+                              y_position: relativePos.y,
+                              status: desk.status === 'initial' ? 'updated' : desk.status,
+                          }
+                        : desk,
+                ),
+            );
+        },
+        [isDragging, selectedDeskId, dragOffset, floorPlanDimensions, absoluteToRelative],
+    );
 
     // Handle mouse up (stop dragging and save to history)
     const handleMouseUp = useCallback(() => {
@@ -298,73 +301,72 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         setSelectedDeskId(null);
     }, [isDragging, selectedDeskId, editorDesks, nextClientId, saveToHistory]);
 
-
-
     // Handle save
     const handleSave = useCallback(() => {
         // Only desks with 'initial', 'updated', or 'deleted' status need to be processed
         // 'new' desks that aren't deleted are included, 'new' desks that were removed are ignored
-        const desksToSave = editorDesks.filter(desk => desk.status === 'new');
-        const desksToEdit = editorDesks.filter(desk => desk.status === "updated");
-        const desksToDelete = editorDesks.filter(desk => desk.status === 'deleted');
+        const desksToSave = editorDesks.filter((desk) => desk.status === 'new');
+        const desksToEdit = editorDesks.filter((desk) => desk.status === 'updated');
+        const desksToDelete = editorDesks.filter((desk) => desk.status === 'deleted');
 
         // Prepare data for backend
         const submitData = {
-            "desks_to_create": desksToSave.map(desk => ({
-                "floor_id": floor.id,
-                "desk_number": desk.desk_number.toString(),
-                "location_description": desk.location_description,
-                "x_position": desk.x_position,
-                "y_position": desk.y_position,
+            desks_to_create: desksToSave.map((desk) => ({
+                floor_id: floor.id,
+                desk_number: desk.desk_number.toString(),
+                location_description: desk.location_description,
+                x_position: desk.x_position,
+                y_position: desk.y_position,
             })),
-            "desks_to_edit": desksToEdit.map(desk => ({
-                "id": desk.id,
-                "floor_id": floor.id,
-                "desk_number": desk.desk_number.toString(),
-                "location_description": desk.location_description,
-                "x_position": desk.x_position,
-                "y_position": desk.y_position,
+            desks_to_edit: desksToEdit.map((desk) => ({
+                id: desk.id,
+                floor_id: floor.id,
+                desk_number: desk.desk_number.toString(),
+                location_description: desk.location_description,
+                x_position: desk.x_position,
+                y_position: desk.y_position,
             })),
-            "desks_to_delete": desksToDelete.map(desk => desk.id).filter(Boolean),
-            "office_id":  office.id,
-            "floor_id": floor.id
-        }
+            desks_to_delete: desksToDelete.map((desk) => desk.id).filter(Boolean),
+            office_id: office.id,
+            floor_id: floor.id,
+        };
 
-        router.post(route("desk.storeMultiple"), submitData, {
+        router.post(route('desk.storeMultiple'), submitData, {
             preserveState: true,
             preserveScroll: true,
             onError: (error) => {
                 console.log(error);
             },
-            onSuccess: (page) => {
-            }
-        })
+            onSuccess: (page) => {},
+        });
     }, [editorDesks, floor.id]);
 
-    const updateDeskLocationDescription = useCallback((locationDescription: string) => {
-        if(!selectedDeskId) return;
+    const updateDeskLocationDescription = useCallback(
+        (locationDescription: string) => {
+            if (!selectedDeskId) return;
 
-        const desk = visibleDesks.find(desk => desk.clientId === selectedDeskId);
-        if(!desk) return;
+            const desk = visibleDesks.find((desk) => desk.clientId === selectedDeskId);
+            if (!desk) return;
 
-        desk.location_description = locationDescription;
+            desk.location_description = locationDescription;
 
-
-        setEditorDesks(prev => prev.map(desk =>
-            desk.clientId === selectedDeskId
-                ? {
-                    ...desk,
-                    location_description: locationDescription,
-                    status: desk.status === 'initial' ? 'updated' : desk.status
-                }
-                : desk
-        ));
-
-
-    }, [selectedDeskId, visibleDesks]);
+            setEditorDesks((prev) =>
+                prev.map((desk) =>
+                    desk.clientId === selectedDeskId
+                        ? {
+                              ...desk,
+                              location_description: locationDescription,
+                              status: desk.status === 'initial' ? 'updated' : desk.status,
+                          }
+                        : desk,
+                ),
+            );
+        },
+        [selectedDeskId, visibleDesks],
+    );
 
     const hasChanges = useMemo(() => {
-        return editorDesks.some(desk => desk.status !== 'initial')
+        return editorDesks.some((desk) => desk.status !== 'initial');
     }, [editorDesks]);
 
     // Check if undo/redo are available
@@ -402,19 +404,14 @@ const useFloorPlanEditorState = (props: { floor: Floor, office: Office}) => {
         isDragging,
         historyIndex,
         updateDeskLocationDescription,
-        hasChanges
-    }
+        hasChanges,
+    };
+};
 
-}
-
-export const PlanEditorProvider: React.FC<{ children: React.ReactNode, office: Office, floor: Floor }> = (props) => {
-    const { children, floor, office} = props;
+export const PlanEditorProvider: React.FC<{ children: React.ReactNode; office: Office; floor: Floor }> = (props) => {
+    const { children, floor, office } = props;
 
     const value = useFloorPlanEditorState({ floor, office });
 
-    return (
-        <FloorPlanEditorContext.Provider value={value}>
-            {children}
-        </FloorPlanEditorContext.Provider>
-    )
-}
+    return <FloorPlanEditorContext.Provider value={value}>{children}</FloorPlanEditorContext.Provider>;
+};
