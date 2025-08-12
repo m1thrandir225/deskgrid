@@ -22,8 +22,16 @@ class DemoRestrictions
         if ($request->routeIs('register')) {
             return redirect()->route('login');
         }
-        $this->enforceUserLimits($request);
-        $this->blockDestructiveActions($request);
+
+        try {
+
+            $this->enforceUserLimits($request);
+            $this->blockDestructiveActions($request);
+        } catch (\Exception $e) {
+            return  response()->json([
+                'message' => $e->getMessage(),
+            ], 403);
+    }
 
         return $next($request);
     }
@@ -37,7 +45,15 @@ class DemoRestrictions
 
     private function blockDestructiveActions(Request $request)
     {
-        $blockedRoutes = ['users.destroy', 'settings.reset', 'desks.destroy', 'offices.destroy', 'offices.update', 'offices.store', 'offices.create', 'offices.floors.destroy', 'offices.floors.update', 'offices.floors.store', 'offices.floors.create', 'employees.destroy', 'employees.edit', 'employees.update', 'employees.store', 'employees.create', 'employees.import', 'employees.storeMultiple'];
+        $blockedRoutes = ['users.destroy', 'settings.reset',
+            'desks.destroy', 'offices.destroy', 'offices.update',
+            'offices.store', 'offices.create', 'offices.floors.destroy',
+            'offices.floors.update', 'offices.floors.store', 'offices.floors.create',
+            'employees.destroy', 'employees.edit', 'employees.update',
+            'employees.store', 'employees.create', 'employees.import',
+            'employees.storeMultiple', 'password.reset', 'password.update',
+            "profile.update", "profile.destroy",
+        ];
 
         if ($request->routeIs($blockedRoutes)) {
             throw new \Exception("This action is not allowed in demo mode");

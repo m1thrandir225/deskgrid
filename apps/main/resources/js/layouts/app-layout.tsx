@@ -13,12 +13,7 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children, breadcrumbs = [], title }: AppLayoutProps) {
-    const { auth, demo } = usePage<SharedData>().props;
-
-    if (!auth || !auth.user) {
-        // Optionally render a fallback or redirect
-        return <div>Loading...</div>;
-    }
+    const { auth , demo } = usePage<SharedData>().props;
     const isAdmin = auth.user.role === 'admin';
 
     return isAdmin ? (
@@ -26,7 +21,7 @@ export default function AppLayout({ children, breadcrumbs = [], title }: AppLayo
             <Head title={title} />
             <div className="relative flex h-full w-full flex-col gap-8 px-4 py-6">
                 {children}
-                {demo && <DemoBanner data={demo} />}
+                {demo && <DemoBanner />}
             </div>
             <Toaster />
         </AppSidebarLayout>
@@ -35,7 +30,7 @@ export default function AppLayout({ children, breadcrumbs = [], title }: AppLayo
             <Head title={title} />
             <div className={'relative'}>
                 {children}
-                {demo && <DemoBanner data={demo} />}
+                {demo && <DemoBanner />}
             </div>
 
             <Toaster />

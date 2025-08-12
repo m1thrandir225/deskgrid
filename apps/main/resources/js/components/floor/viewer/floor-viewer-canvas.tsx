@@ -59,7 +59,7 @@ export const FloorViewerCanvas: React.FC<FloorViewerCanvasProps> = (props) => {
         <div ref={floorPlanRef} className="relative col-span-2 h-full w-auto bg-red-50 p-4">
             <img
                 ref={imageRef}
-                src={getFileUrl(floor.plan_image)}
+                src={floor.plan_image_url}
                 alt={floor.name}
                 className="h-auto w-full object-contain"
                 onLoad={handleImageLoad}

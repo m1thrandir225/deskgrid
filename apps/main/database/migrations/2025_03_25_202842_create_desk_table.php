@@ -15,8 +15,8 @@ return new class () extends Migration {
             $table->foreignId('floor_id')->constrained();
             $table->string("desk_number");
             $table->string("location_description")->nullable();
-            $table->integer("x_position");
-            $table->integer("y_position");
+            $table->double("x_position");
+            $table->double("y_position");
             $table->boolean("is_active")->default(true);
             $table->timestamps();
         });

@@ -35,6 +35,14 @@ class ReservationController extends Controller
             $floors = Floor::query()
                 ->where('office_id', $selectedOfficeId)
                 ->get();
+
+            $floors->each(function ($floor) {
+                if (config('demo.enabled')) {
+                    $floor->plan_image_url = asset($floor->plan_image);
+                } else {
+                    $floor->plan_image_url = asset(Storage::url($floor->plan_image));
+                }
+            });
         }
 
         $desks = collect();
@@ -155,7 +163,7 @@ class ReservationController extends Controller
     {
         Gate::authorize('delete', $reservation);
 
-        $reservation->changeStatus(ReservationStatus::Cancelled);
+        $reservation->delete();
 
         return back()->with("message", "Reservation cancelled.");
     }
@@ -179,8 +187,16 @@ class ReservationController extends Controller
             ->get();
 
         $reservations->each(function ($reservation) {
-            $plan_image = $reservation->desk->floor()->first()->plan_image;
-            $reservation->desk->floor->plan_image_url = asset(Storage::url($plan_image));
+            $floor = $reservation->desk->floor;
+            if ($floor)  {
+                $plan_image = $reservation->desk->floor()->first()->plan_image;
+                if (config("demo.enabled")) {
+                    $reservation->desk->floor->plan_image_url = asset($plan_image);
+                } else {
+                    $reservation->desk->floor->plan_image_url = asset(Storage::url($plan_image));
+                }
+            }
+
         });
 
         return Inertia::render("reservations/my-reservations", [

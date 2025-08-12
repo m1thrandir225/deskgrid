@@ -8,7 +8,7 @@ export default function AuthLayout({ children, title, description, ...props }: {
     return (
         <AuthLayoutTemplate title={title} description={description} {...props}>
             {children}
-            {demo && <DemoBanner data={demo} />}
+            {demo && <DemoBanner />}
         </AuthLayoutTemplate>
     );
 }

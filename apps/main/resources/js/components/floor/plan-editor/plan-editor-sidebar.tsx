@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFloorPlanEditorContext } from '@/contexts/plan-editor-context';
 import PlanEditorSidebarItem from '@/components/floor/plan-editor/plan-editor-sidebar-item';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const FloorPlanEditorSidebar: React.FC = () => {
     const {
@@ -15,16 +16,16 @@ const FloorPlanEditorSidebar: React.FC = () => {
     return (
         <div className="bg-background w-full h-full col-span-1" >
             <div className="p-4 border-b">
-                <h2 className="text-lg font-semibold text-gray-900">Desks</h2>
-                <p className="text-sm text-gray-600">{visibleDesks.length} total desks</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <h2 className="text-lg font-semibold ">Desks</h2>
+                <p className="text-sm ">{visibleDesks.length} total desks</p>
+                <p className="text-xs text-gray-400 mt-1">
                     History: {historyIndex + 1}/{historyState.total}
                 </p>
             </div>
 
-            <div className="h-auto overflow-y-scroll max-h-[500px]">
+            <ScrollArea className={"h-full w-full p-4 max-h-[650px]"} >
                 {visibleDesks.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500">
+                    <div className="p-4 text-center ">
                         No desks yet. Click "Add Desk" to get started.
                     </div>
                 ) : (
@@ -41,6 +42,10 @@ const FloorPlanEditorSidebar: React.FC = () => {
                         ))}
                     </div>
                 )}
+            </ScrollArea>
+
+            <div className="h-auto overflow-y-scroll max-h-[500px]">
+
             </div>
         </div>
     )

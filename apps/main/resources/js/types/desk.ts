@@ -1,5 +1,5 @@
-import { Reservation, ReservationWithUser } from '@/types/reservation';
-import { Floor, FloorWithOffice } from '@/types/floor';
+import {  ReservationWithUser } from '@/types/reservation';
+import {  FloorWithOffice } from '@/types/floor';
 
 /**
  * Desk Model

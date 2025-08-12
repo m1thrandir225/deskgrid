@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
@@ -9,8 +9,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { SharedData } from '@/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-interface LoginForm {
+type LoginForm =  {
     email: string;
     password: string;
     remember: boolean;
@@ -21,10 +23,11 @@ interface LoginProps {
     canResetPassword: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+const  Login = ({ status, canResetPassword }: LoginProps) => {
+    const { demo } = usePage<SharedData>().props;
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
-        email: '',
-        password: '',
+        email: "",
+        password: "",
         remember: false,
     });
 
@@ -38,6 +41,22 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     return (
         <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             <Head title="Log in" />
+            {demo && (
+                <Alert className={'flex flex-col gap-4'}>
+                    <AlertTitle>Running in Demo Mode</AlertTitle>
+                    <AlertDescription className={'flex flex-col gap-2'}>
+                        <h1 className={'font-bold'}> Use the following credentials to log in:</h1>
+                        <div className={''}>
+                            <h1>Admin User:</h1>
+                            <p className={'pb-1 text-sm'}>{demo.adminEmail}/{demo.password}</p>
+                        </div>
+                        <div className={''}>
+                            <h1>Employee User:</h1>
+                            <p className={'pb-1 text-sm'}>{demo.userEmail}/{demo.password}</p>
+                        </div>
+                    </AlertDescription>
+                </Alert>
+            )}
 
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
@@ -102,3 +121,4 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         </AuthLayout>
     );
 }
+export default Login;

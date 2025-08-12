@@ -19,7 +19,7 @@ return new class () extends Migration {
             $table->enum("status", array_column(ReservationStatus::cases(), 'value'))->default(ReservationStatus::Pending);
             $table->timestamps();
 
-            $table->unique(["desk_id", "reservation_date"]);
+            $table->unique(["desk_id", "reservation_date", "status"]);
         });
     }
 

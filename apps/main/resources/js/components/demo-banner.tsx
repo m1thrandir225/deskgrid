@@ -1,26 +1,53 @@
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DemoData } from '@/types';
 import React from 'react';
+import { Info, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-interface ComponentProps {
-    data: DemoData;
-}
 
-const DemoBanner: React.FC<ComponentProps> = (props) => {
-    const { data } = props;
+const DemoBanner: React.FC = () => {
+    const [isOpen, setIsOpen] = React.useState(false)
+
     return (
-        <Alert className="absolute right-5 bottom-5 mb-4 w-auto">
-            <AlertDescription className="">
-                <strong>Demo Mode:</strong> Try it out! Login with <h1>Admin:</h1>
-                <code className="rounded px-1">
-                    {data.adminEmail} / {data.password}
-                </code>
-                <h1>Employee:</h1>
-                <code className="px-1">
-                    {data.userEmail} / {data.password}
-                </code>
-            </AlertDescription>
-        </Alert>
+        <div className="fixed right-5 bottom-5 z-50">
+            <div
+                className={`transition-all duration-300 ${
+                    isOpen
+                        ? 'opacity-100 scale-100 pointer-events-auto'
+                        : 'opacity-0 scale-95 pointer-events-none'
+                }`}
+            >
+                <Alert className={"flex flex-col items-start w-full max-w-[300px]"}>
+                    <div className={"w-full flex items-center justify-between"}>
+                        <AlertTitle>Demo Mode</AlertTitle>
+                        <Button
+                            size={"icon"}
+                            variant={"outline"}
+                            onClick={() => setIsOpen(false)}
+                            aria-label="Close demo banner"
+                        >
+                            <X />
+                        </Button>
+                    </div>
+                    <AlertDescription className={"flex flex-col gap-2"}>
+                        DeskGrid is currently in demo mode. Some features may be limited or not available.
+                    </AlertDescription>
+                </Alert>
+            </div>
+
+            <Button
+                className={`transition-all duration-300 absolute right-0 bottom-0  ${
+                    isOpen
+                        ? 'opacity-0 scale-95 pointer-events-none'
+                        : 'opacity-100 scale-100 pointer-events-auto'
+                }`}
+                onClick={() => setIsOpen(true)}
+                variant={"default"}
+                size={"icon"}
+            >
+                <Info className="text-orange-600" />
+            </Button>
+        </div>
     );
 };
 
