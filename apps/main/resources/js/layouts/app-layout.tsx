@@ -3,8 +3,8 @@ import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 import { type BreadcrumbItem, SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import React from 'react';
-import { Toaster } from 'sonner';
+import React, { useEffect } from 'react';
+import { toast, Toaster } from 'sonner';
 
 interface AppLayoutProps {
     children: React.ReactNode;
@@ -13,8 +13,16 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children, breadcrumbs = [], title }: AppLayoutProps) {
-    const { auth , demo } = usePage<SharedData>().props;
+    const { auth , demo, flash} = usePage<SharedData>().props;
     const isAdmin = auth.user.role === 'admin';
+
+    useEffect(() => {
+        if(flash.error) {
+            toast.error(flash.error);
+        } else if (flash.message) {
+            toast.success(flash.message);
+        }
+    }, [flash]);
 
     return isAdmin ? (
         <AppSidebarLayout breadcrumbs={breadcrumbs}>

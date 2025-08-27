@@ -28,9 +28,7 @@ class DemoRestrictions
             $this->enforceUserLimits($request);
             $this->blockDestructiveActions($request);
         } catch (\Exception $e) {
-            return  response()->json([
-                'message' => $e->getMessage(),
-            ], 403);
+            return  redirect()->back()->with('error', $e->getMessage());
     }
 
         return $next($request);
