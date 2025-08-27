@@ -17,13 +17,8 @@ const appMenues = {
     rightNavItems: [
         {
             title: 'Repository',
-            url: 'https://github.com/laravel/react-starter-kit',
+            url: 'https://github.com/m1thrandir225/deskgrid',
             icon: Folder,
-        },
-        {
-            title: 'Documentation',
-            url: 'https://laravel.com/docs/starter-kits',
-            icon: BookOpen,
         },
     ]
 }
@@ -49,13 +44,8 @@ const adminMenues = {
     rightNavItems: [
         {
             title: 'Repository',
-            url: 'https://github.com/laravel/react-starter-kit',
+            url: "https://github.com/m1thrandir225/deskgrid",
             icon: Folder,
-        },
-        {
-            title: 'Documentation',
-            url: 'https://laravel.com/docs/starter-kits',
-            icon: BookOpen,
         },
     ]
 }

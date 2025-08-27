@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu } from 'lucide-react';
-import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 import {appMenues} from '@/constants/menu-items';
 
@@ -45,7 +44,11 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
-                                    <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
+                                    <div className="mb-1 flex  h-auto items-center justify-center rounded-md">
+                                        <div className="flex items-center space-x-2 w-[100px] h-[34px]">
+                                            <AppLogoIcon />
+                                        </div>
+                                    </div>
                                 </SheetHeader>
                                 <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
@@ -79,7 +82,9 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     </div>
 
                     <Link href={isAdmin ? '/dashboard' : '/my-reservations'} prefetch className="flex items-center space-x-2">
-                        <AppLogo />
+                        <div className="flex items-center space-x-2 w-[100px] h-[34px]">
+                            <AppLogoIcon />
+                        </div>
                     </Link>
 
                     {/* Desktop Navigation */}

@@ -5,6 +5,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { Link } from '@inertiajs/react';
 import AppLogo from './app-logo';
 import { adminMenues } from '@/constants/menu-items';
+import AppLogoIcon from '@/components/app-logo-icon';
 
 export function AppSidebar() {
     return (
@@ -13,8 +14,10 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/" prefetch>
-                                <AppLogo />
+                            <Link href="/" prefetch className="h-auto">
+                                <div className="mb-1 flex w-[100px]  items-center justify-center rounded-md">
+                                    <AppLogoIcon className=" fill-current text-[var(--foreground)] dark:text-white" />
+                                </div>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
