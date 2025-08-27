@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Office } from '@/types/office';
-import { Floor } from '@/types/floor';
-import { ReservationDesk } from '@/types/desk';
-import { router } from '@inertiajs/react';
+import FloorViewer from '@/components/floor/viewer/floor-viewer';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import FloorViewer from '@/components/floor/viewer/floor-viewer';
-import { BreadcrumbItem } from '@/types';
-import { endOfWeek, format, startOfWeek } from 'date-fns';
-import { FlashMessage } from '@/types/page';
-import { toast } from 'sonner';
 import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
+import { ReservationDesk } from '@/types/desk';
+import { Floor } from '@/types/floor';
+import { Office } from '@/types/office';
+import { router } from '@inertiajs/react';
+import { endOfWeek, format, startOfWeek } from 'date-fns';
+import React, { useEffect, useState } from 'react';
 
 interface Filters {
     office_id?: string;
@@ -24,7 +22,6 @@ interface PageProps {
     floors: Floor[];
     desks: ReservationDesk[];
     filters: Filters;
-    flash: FlashMessage;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -35,7 +32,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const ReservationsPage: React.FC<PageProps> = (props) => {
-    const { offices, filters, floors, desks, flash} = props;
+    const { offices, filters, floors, desks } = props;
 
     const [selectedOffice, setSelectedOffice] = useState(filters.office_id || '');
     const [selectedFloor, setSelectedFloor] = useState(filters.floor_id || '');
@@ -46,40 +43,38 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
             const weekStart = startOfWeek(today, { weekStartsOn: 1 });
             const weekEnd = endOfWeek(weekStart);
 
-            router.get(route('reservations.index'), {
-                office_id: selectedOffice,
-                floor_id: selectedFloor,
-                start_date: format(weekStart, 'yyyy-MM-dd'),
-                end_date: format(weekEnd, 'yyyy-MM-dd'),
-            }, {
-                preserveState: true,
-                replace: true,
-                preserveScroll: true,
-            });
+            router.get(
+                route('reservations.index'),
+                {
+                    office_id: selectedOffice,
+                    floor_id: selectedFloor,
+                    start_date: format(weekStart, 'yyyy-MM-dd'),
+                    end_date: format(weekEnd, 'yyyy-MM-dd'),
+                },
+                {
+                    preserveState: true,
+                    replace: true,
+                    preserveScroll: true,
+                },
+            );
         }
     }, [selectedOffice, selectedFloor]);
-
-    useEffect(() => {
-        if(flash.message) {
-            toast(flash.message)
-        }
-        if(flash.error) {
-            toast.error(flash.error)
-        }
-    }, [flash])
-
 
     const handleOfficeChange = (value: string) => {
         setSelectedOffice(value);
         setSelectedFloor('');
 
         // Load floors for the selected office
-        router.get(route('reservations.index'), {
-            office_id: value,
-        }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        router.get(
+            route('reservations.index'),
+            {
+                office_id: value,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
     };
 
     const handleFloorChange = (newValue: string) => {
@@ -87,7 +82,7 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
     };
 
     return (
-        <AppLayout title={"Reserve a desk"} breadcrumbs={breadcrumbs}>
+        <AppLayout title={'Reserve a desk'} breadcrumbs={breadcrumbs}>
             <div className="container mx-auto py-8">
                 <h1 className="mb-6 text-3xl font-bold">Make a Reservation</h1>
                 <div className="mb-8 flex w-full flex-col justify-evenly gap-4 rounded-xl border p-6 shadow-sm md:flex-row">
@@ -131,16 +126,12 @@ const ReservationsPage: React.FC<PageProps> = (props) => {
                 </div>
 
                 {desks && desks.length > 0 && selectedFloor ? (
-                    <FloorViewer
-                        desks={desks}
-                        floor={floors.find((f) => f.id.toString() === selectedFloor)!}
-                    />
+                    <FloorViewer desks={desks} floor={floors.find((f) => f.id.toString() === selectedFloor)!} />
                 ) : (
-                    <div className="rounded-lg bg-gray-50 px-4 py-10 text-center">
-                        <p className="text-gray-500">Please select an office and a floor to see available desks.</p>
+                    <div className="bg-accent rounded-lg px-4 py-10 text-center">
+                        <p className="text-accent-foreground">Please select an office and a floor to see available desks.</p>
                     </div>
                 )}
-
             </div>
         </AppLayout>
     );

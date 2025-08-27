@@ -13,11 +13,11 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children, breadcrumbs = [], title }: AppLayoutProps) {
-    const { auth , demo, flash} = usePage<SharedData>().props;
+    const { auth, demo, flash } = usePage<SharedData>().props;
     const isAdmin = auth.user.role === 'admin';
 
     useEffect(() => {
-        if(flash.error) {
+        if (flash.error) {
             toast.error(flash.error);
         } else if (flash.message) {
             toast.success(flash.message);

@@ -1,4 +1,3 @@
-import { getFileUrl } from '@/lib/utils';
 import { SharedData } from '@/types';
 import { ReservationDesk } from '@/types/desk';
 import { Floor } from '@/types/floor';
@@ -56,7 +55,7 @@ export const FloorViewerCanvas: React.FC<FloorViewerCanvasProps> = (props) => {
         [imageSize],
     );
     return (
-        <div ref={floorPlanRef} className="relative col-span-2 h-full w-auto bg-red-50 p-4">
+        <div ref={floorPlanRef} className="bg-background relative col-span-2 h-full w-auto p-4">
             <img
                 ref={imageRef}
                 src={floor.plan_image_url}

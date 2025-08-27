@@ -1,20 +1,11 @@
-import { ReservationDesk } from '@/types/desk';
 import { Button } from '@/components/ui/button';
-import { CalendarCheck, CircleOff, MousePointerClick, TicketX } from 'lucide-react';
 import WeekSelector from '@/components/week-selector';
-import {
-    addDays,
-    eachDayOfInterval,
-    endOfWeek,
-    format,
-    isBefore,
-    isWeekend,
-    startOfToday,
-    startOfWeek
-} from 'date-fns';
-import React from 'react';
 import { SharedData } from '@/types';
+import { ReservationDesk } from '@/types/desk';
 import { usePage } from '@inertiajs/react';
+import { addDays, eachDayOfInterval, format, isBefore, startOfToday } from 'date-fns';
+import { CalendarCheck, CircleOff, MousePointerClick, TicketX } from 'lucide-react';
+import React from 'react';
 
 interface FloorViewerReservationPanelProps {
     desk: ReservationDesk | null;
@@ -34,7 +25,6 @@ export const FloorViewerReservationPanel: React.FC<FloorViewerReservationPanelPr
     const getWorkWeekDates = (weekStartDate: Date, today: Date) => {
         const weekStart = weekStartDate; // This is Monday
         const weekEnd = addDays(weekStart, 4); // Friday
-
 
         // Generate Monday to Friday
         const workDays = eachDayOfInterval({
@@ -96,11 +86,7 @@ export const FloorViewerReservationPanel: React.FC<FloorViewerReservationPanelPr
                                         </div>
                                         {isReserved ? (
                                             isOwnReservation ? (
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={() => reservation && onCancel(reservation.id)}
-                                                >
+                                                <Button variant="destructive" size="sm" onClick={() => reservation && onCancel(reservation.id)}>
                                                     <CircleOff size={16} />
                                                     Cancel
                                                 </Button>
@@ -111,11 +97,7 @@ export const FloorViewerReservationPanel: React.FC<FloorViewerReservationPanelPr
                                                 </div>
                                             )
                                         ) : (
-                                            <Button
-                                                variant="default"
-                                                size="sm"
-                                                onClick={() => onReserve(desk, date)}
-                                            >
+                                            <Button variant="default" size="sm" onClick={() => onReserve(desk, date)}>
                                                 <CalendarCheck size={16} />
                                                 Reserve
                                             </Button>
@@ -126,7 +108,7 @@ export const FloorViewerReservationPanel: React.FC<FloorViewerReservationPanelPr
                         </div>
                     </div>
                 ) : (
-                    <p className="flex flex-row items-center gap-2 rounded-md border border-yellow-200 bg-yellow-50 p-2">
+                    <p className="bg-background flex flex-row items-center gap-2 rounded-md border border-yellow-200 p-2">
                         <MousePointerClick />
                         Please click on one of the desks to see available reservation slots.
                     </p>

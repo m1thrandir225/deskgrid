@@ -1,20 +1,17 @@
+import DeskLocationPopover from '@/components/desk/desk-location-popover';
 import { Button } from '@/components/ui/button';
 import WeekSelector from '@/components/week-selector';
-import AppHeaderLayout from '@/layouts/app/app-header-layout';
+import AppLayout from '@/layouts/app-layout';
+import { ReservationWithDesk } from '@/types/reservation';
 import { router } from '@inertiajs/react';
 import { addDays, format, startOfWeek } from 'date-fns';
 import { Building, CalendarCheck, CircleOff, MapPin } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import AppLayout from '@/layouts/app-layout';
-import { DeskWithFloor } from '@/types/desk';
-import { Reservation, ReservationWithDesk } from '@/types/reservation';
-import DeskLocationPopover from '@/components/desk/desk-location-popover';
 
 interface Filters {
     start_date?: string;
     end_date?: string;
 }
-
 
 interface PageProps {
     reservations: ReservationWithDesk[];
@@ -78,7 +75,7 @@ const MyReservationsPage: React.FC<PageProps> = (props) => {
     const weekDays = getWeekDays();
 
     return (
-        <AppLayout title={"My Reservations"} breadcrumbs={[]}>
+        <AppLayout title={'My Reservations'} breadcrumbs={[]}>
             <div className="container mx-auto py-8">
                 <div className="mb-6">
                     <h1 className="text-3xl font-bold">My Reservations</h1>
@@ -89,7 +86,7 @@ const MyReservationsPage: React.FC<PageProps> = (props) => {
                     <WeekSelector currentWeek={currentDate} onWeekChange={handleWeekChange} />
                 </div>
 
-                <div className="rounded-lg border bg-white shadow-sm">
+                <div className="bg-background rounded-lg border shadow-sm">
                     <div className="border-b px-6 py-4">
                         <h2 className="text-lg font-semibold">
                             Week of {format(currentDate, 'MMM d')} - {format(addDays(currentDate, 4), 'MMM d, yyyy')}
@@ -102,15 +99,15 @@ const MyReservationsPage: React.FC<PageProps> = (props) => {
                             const isToday = format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
 
                             return (
-                                <div key={date.toISOString()} className={`flex items-center justify-between p-6 ${isToday ? 'bg-blue-50' : ''}`}>
+                                <div key={date.toISOString()} className={`flex items-center justify-between p-6 ${isToday ? 'bg-accent' : ''}`}>
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3">
                                             <div>
-                                                <h3 className={`font-medium ${isToday ? 'text-blue-900' : ''}`}>
+                                                <h3 className={`font-medium ${isToday ? 'text-primary' : ''}`}>
                                                     {format(date, 'EEEE')}
-                                                    {isToday && <span className="ml-2 text-sm text-blue-600">(Today)</span>}
+                                                    {isToday && <span className="text-primary ml-2 text-sm">(Today)</span>}
                                                 </h3>
-                                                <p className={`text-sm ${isToday ? 'text-blue-700' : 'text-gray-500'}`}>
+                                                <p className={`text-sm ${isToday ? 'text-primary' : 'text-gray-500'}`}>
                                                     {format(date, 'MMM d, yyyy')}
                                                 </p>
                                             </div>
@@ -159,7 +156,7 @@ const MyReservationsPage: React.FC<PageProps> = (props) => {
                             <CalendarCheck size={48} className="mx-auto mb-4 text-gray-300" />
                             <h3 className="mb-2 text-lg font-medium text-gray-900">No reservations this week</h3>
                             <p className="mb-4 text-gray-500">You don't have any desk reservations for this week.</p>
-                            <Button onClick={() => router.get(route('reservations.index'))} className="bg-blue-600 hover:bg-blue-700">
+                            <Button onClick={() => router.get(route('reservations.index'))}>
                                 <CalendarCheck size={16} />
                                 Make a Reservation
                             </Button>

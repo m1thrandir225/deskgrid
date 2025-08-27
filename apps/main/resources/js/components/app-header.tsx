@@ -7,13 +7,14 @@ import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuT
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
+import { appMenues } from '@/constants/menu-items';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Menu } from 'lucide-react';
 import AppLogoIcon from './app-logo-icon';
-import {appMenues} from '@/constants/menu-items';
+import AppearanceToggleDropdown from './appearance-dropdown';
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
@@ -27,7 +28,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const { url } = page;
     const getInitials = useInitials();
 
-    const isAdmin = auth.user.role === "admin";
+    const isAdmin = auth.user.role === 'admin';
 
     return (
         <>
@@ -44,8 +45,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <SheetContent side="left" className="bg-sidebar flex h-full w-64 flex-col items-stretch justify-between">
                                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                                 <SheetHeader className="flex justify-start text-left">
-                                    <div className="mb-1 flex  h-auto items-center justify-center rounded-md">
-                                        <div className="flex items-center space-x-2 w-[100px] h-[34px]">
+                                    <div className="mb-1 flex h-auto items-center justify-center rounded-md">
+                                        <div className="flex h-[34px] w-[100px] items-center space-x-2">
                                             <AppLogoIcon />
                                         </div>
                                     </div>
@@ -82,7 +83,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     </div>
 
                     <Link href={isAdmin ? '/dashboard' : '/my-reservations'} prefetch className="flex items-center space-x-2">
-                        <div className="flex items-center space-x-2 w-[100px] h-[34px]">
+                        <div className="flex h-[34px] w-[100px] items-center space-x-2">
                             <AppLogoIcon />
                         </div>
                     </Link>
@@ -116,6 +117,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
                             <div className="hidden lg:flex">
+                                <AppearanceToggleDropdown />
                                 {appMenues.rightNavItems.map((item) => (
                                     <TooltipProvider key={item.title} delayDuration={0}>
                                         <Tooltip>
