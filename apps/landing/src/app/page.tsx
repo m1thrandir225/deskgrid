@@ -1,25 +1,5 @@
-import Image from "next/image";
-import {
-  Building,
-  CalendarCheck,
-  ExternalLink,
-  Github,
-  Users,
-  Star,
-  Zap,
-  Shield,
-  ArrowRight,
-  CheckCircle,
-  Globe,
-  Lock,
-  Smartphone,
-  BarChart3,
-  Clock,
-  MapPin,
-  Eye,
-  Download,
-  Play,
-} from "lucide-react";
+import {Logo} from "@/components/logo";
+import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {
   Card,
@@ -28,8 +8,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {Badge} from "@/components/ui/badge";
-import {Logo} from "@/components/logo";
+import {
+  ArrowRight,
+  BarChart3,
+  Building,
+  CalendarCheck,
+  CheckCircle,
+  Clock,
+  Download,
+  ExternalLink,
+  Eye,
+  Github,
+  Globe,
+  Lock,
+  Play,
+  Shield,
+  Smartphone,
+  Star,
+  Users,
+  Zap,
+} from "lucide-react";
 
 export default function Home() {
   const demoURL = process.env.DEMO_URL;
@@ -250,7 +248,7 @@ export default function Home() {
                 Built for the future of work
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                DeskGrid adapts to your organization's unique needs with
+                DeskGrid adapts to your organization&apos;s unique needs with
                 flexible deployment options and comprehensive customization
                 capabilities.
               </p>
