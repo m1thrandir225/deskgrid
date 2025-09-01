@@ -154,7 +154,7 @@ const MyReservationsPage: React.FC<PageProps> = (props) => {
                     {reservations.length === 0 && (
                         <div className="py-12 text-center">
                             <CalendarCheck size={48} className="mx-auto mb-4 text-gray-300" />
-                            <h3 className="mb-2 text-lg font-medium text-gray-900">No reservations this week</h3>
+                            <h3 className="mb-2 text-lg font-medium">No reservations this week</h3>
                             <p className="mb-4 text-gray-500">You don't have any desk reservations for this week.</p>
                             <Button onClick={() => router.get(route('reservations.index'))}>
                                 <CalendarCheck size={16} />

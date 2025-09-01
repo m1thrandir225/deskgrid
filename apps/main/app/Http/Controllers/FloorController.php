@@ -42,6 +42,8 @@ class FloorController extends Controller
 
         $filePath = $request->file('plan_image')->store('floor_plans');
 
+        Storage::setVisibility($filePath, "public");
+
         $floor = Floor::create([
             'office_id' => $validated['office_id'],
             'name' => $validated['name'],
@@ -95,6 +97,7 @@ class FloorController extends Controller
         if ($request->hasFile("plan_image")) {
             Storage::delete($floor->plan_image);
             $filePath = $request->file('plan_image')->store('floor_plans');
+            Storage::setVisibility($filePath, "public");
             $dataToUpdate["plan_image"] = $filePath;
         }
 
@@ -107,6 +110,7 @@ class FloorController extends Controller
     {
         Gate::authorize('delete', $floor);
 
+        Storage::delete($floor->plan_image);
         $floor->delete();
 
         return to_route('offices.show', $office->id);

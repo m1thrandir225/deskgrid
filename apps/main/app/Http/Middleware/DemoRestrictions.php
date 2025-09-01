@@ -29,7 +29,7 @@ class DemoRestrictions
             $this->blockDestructiveActions($request);
         } catch (\Exception $e) {
             return  redirect()->back()->with('error', $e->getMessage());
-    }
+        }
 
         return $next($request);
     }
@@ -43,14 +43,29 @@ class DemoRestrictions
 
     private function blockDestructiveActions(Request $request)
     {
-        $blockedRoutes = ['users.destroy', 'settings.reset',
-            'desks.destroy', 'offices.destroy', 'offices.update',
-            'offices.store', 'offices.create', 'offices.floors.destroy',
-            'offices.floors.update', 'offices.floors.store', 'offices.floors.create',
-            'employees.destroy', 'employees.edit', 'employees.update',
-            'employees.store', 'employees.create', 'employees.import',
-            'employees.storeMultiple', 'password.reset', 'password.update',
-            "profile.update", "profile.destroy",
+        $blockedRoutes = [
+            'users.destroy',
+            'settings.reset',
+            'desks.destroy',
+            'offices.destroy',
+            'offices.update',
+            'offices.store',
+            'offices.create',
+            'offices.floors.destroy',
+            'offices.floors.update',
+            'offices.floors.store',
+            'offices.floors.create',
+            'employees.destroy',
+            'employees.edit',
+            'employees.update',
+            'employees.store',
+            'employees.create',
+            'employees.import',
+            'employees.storeMultiple',
+            'password.reset',
+            'password.update',
+            "profile.update",
+            "profile.destroy",
         ];
 
         if ($request->routeIs($blockedRoutes)) {
