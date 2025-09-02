@@ -2,6 +2,7 @@
 
 use App\Enums\ReservationStatus;
 use App\Enums\UserRole;
+use App\Http\Controllers\DashboardController;
 use App\Models\Desk;
 use App\Models\Office;
 use App\Models\Reservation;
@@ -19,22 +20,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified', "admin"])->group(function () {
-    Route::get('dashboard', function () {
-        $totalOffices = Office::count();
-        $totalDesks = Desk::count();
-        $totalEmployees = User::where('role', UserRole::Employee)->count();
-        $todaysReservations = Reservation::whereDate('reservation_date', today())
-            ->whereNotIn('status', [ReservationStatus::Cancelled])
-            ->count();
-        return Inertia::render('dashboard', [
-            'stats' => [
-                'total_offices' => $totalOffices,
-                'total_desks' => $totalDesks,
-                'total_employees' => $totalEmployees,
-                'todays_reservations' => $todaysReservations,
-            ]
-        ]);
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 require __DIR__ . '/settings.php';

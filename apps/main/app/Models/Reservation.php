@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ReservationStatus;
+use App\Services\CacheInvalidationService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +26,9 @@ class Reservation extends Model
         'status' => ReservationStatus::class,
     ];
 
+    /*
+    * Relationships
+    */
     public function desk(): BelongsTo
     {
         return $this->belongsTo(Desk::class);
@@ -35,10 +39,34 @@ class Reservation extends Model
         return $this->belongsTo(User::class);
     }
 
+    /*
+    * Methods
+    */
     public function changeStatus(ReservationStatus $status)
     {
         return $this->update([
             'status' => $status
         ]);
+    }
+
+    protected static function booted()
+    {
+        static::saved(function ($reservation) {
+            $desk = $reservation->desk()->with('floor.office')->first();
+            CacheInvalidationService::invalidateReservationCache(
+                $reservation->desk_id,
+                $reservation->reservation_date,
+                $desk->floor->office->user_id
+            );
+        });
+
+        static::deleted(function ($reservation) {
+            $desk = $reservation->desk()->with('floor.office')->first();
+            CacheInvalidationService::invalidateReservationCache(
+                $reservation->desk_id,
+                $reservation->reservation_date,
+                $desk->floor->office->user_id
+            );
+        });
     }
 }

@@ -50,7 +50,7 @@ export default function Dashboard({ stats }: DashboardProps) {
             value: stats.todays_reservations,
             description: 'Active desk bookings',
             icon: Calendar,
-            href: '/reservations',
+            href: null,
         },
     ];
 
@@ -86,7 +86,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                 {/* Statistics Cards */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     {statCards.map((card) => (
-                        <Link key={card.title} href={card.href}>
+                        <Link key={card.title} href={card.href ?? ''}>
                             <Card className="hover:bg-muted/50 cursor-pointer transition-colors">
                                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-sm font-medium">{card.title}</CardTitle>

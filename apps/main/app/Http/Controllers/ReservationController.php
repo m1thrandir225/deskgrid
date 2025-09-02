@@ -13,6 +13,7 @@ use App\Models\Reservation;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -26,18 +27,20 @@ class ReservationController extends Controller
         $offices = Office::query()->get();
         $selectedOfficeId = $request->input('office_id');
         $selectedFloorId = $request->input('floor_id');
-
-
         $startDate = $request->date('start_date') ?? now();
         $endDate = $request->date('end_date') ?? $startDate->copy()->endOfWeek();
 
 
+        $offices = Cache::remember('all_offices', 3600, function () {
+            return Office::all();
+        });
+
         $floors = collect();
 
         if ($selectedOfficeId) {
-            $floors = Floor::query()
-                ->where('office_id', $selectedOfficeId)
-                ->get();
+            $floors = Cache::remember("office_floors_{$selectedOfficeId}", 1800, function () use ($selectedOfficeId) {
+                return Floor::where('office_id', $selectedOfficeId)->get();
+            });
 
             $floors->each(function ($floor) {
                 if (config('demo.enabled')) {
@@ -51,20 +54,20 @@ class ReservationController extends Controller
         $desks = collect();
 
         if ($selectedFloorId) {
-            $desks = Desk::query()
-                ->with("floor")
-                ->with(['reservations' => function ($query) use ($startDate, $endDate) {
-                    $query
-                        ->whereBetween('reservation_date', [
-                            $startDate->toDateString(),
-                            $endDate->toDateString(),
-                        ])
-                        ->whereNotIn("status", [ReservationStatus::Cancelled])
-                        ->with("user:id,name,email")
-                        ->get();
-                }])
-                ->where('floor_id', $selectedFloorId)
-                ->get();
+            $desks = Cache::remember("floor_desks_{$selectedFloorId}", 900, function () use ($selectedFloorId) {
+                return Desk::with("floor")
+                    ->where('floor_id', $selectedFloorId)
+                    ->get();
+            });
+
+            $desks->load(['reservations' => function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('reservation_date', [
+                    $startDate->toDateString(),
+                    $endDate->toDateString(),
+                ])
+                    ->whereNotIn("status", [ReservationStatus::Cancelled])
+                    ->with("user:id,name,email");
+            }]);
         }
 
         return Inertia::render("reservations/index", [
@@ -210,19 +213,24 @@ class ReservationController extends Controller
     {
         $startDate = $request->date('start_date') ?? now()->startOfWeek();
         $endDate = $request->date('end_date') ?? $startDate->copy()->addDays(4); // Friday
+        $userId = $request->user()->id;
 
-        $reservations = $request->user()
-            ->reservations()
-            ->with([
-                'desk.floor.office',
-            ])
-            ->whereBetween('reservation_date', [
-                $startDate->toDateString(),
-                $endDate->toDateString(),
-            ])
-            ->whereNotIn('status', [ReservationStatus::Cancelled])
-            ->orderBy('reservation_date')
-            ->get();
+        $cacheKey = "user_reservations_{$userId}_{$startDate->toDateString()}_{$endDate->toDateString()}";
+
+        $reservations = Cache::remember($cacheKey, 600, function () use ($request, $startDate, $endDate) {
+            return $request->user()
+                ->reservations()
+                ->with([
+                    'desk.floor.office',
+                ])
+                ->whereBetween('reservation_date', [
+                    $startDate->toDateString(),
+                    $endDate->toDateString(),
+                ])
+                ->whereNotIn('status', [ReservationStatus::Cancelled])
+                ->orderBy('reservation_date')
+                ->get();
+        });
 
         $reservations->each(function ($reservation) {
             $floor = $reservation->desk->floor;

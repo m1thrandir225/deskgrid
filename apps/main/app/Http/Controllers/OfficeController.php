@@ -8,6 +8,7 @@ use App\Http\Requests\Office\UpdateOfficeRequest;
 use App\Models\Office;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -22,7 +23,9 @@ class OfficeController extends Controller
     {
         $user = $request->user();
 
-        $offices = Office::query()->where('user_id', $user->id)->get();
+        $offices = Cache::remember("user_offices_{$user->id}", 3600, function () use ($user) {
+            return Office::query()->where('user_id', $user->id)->get();
+        });
 
         return Inertia::render('offices/index', [
             'offices' => $offices
@@ -35,16 +38,18 @@ class OfficeController extends Controller
     {
         Gate::authorize('create', Office::class);
 
-        $timezones = collect(timezone_identifiers_list())
-            ->groupBy(function ($timezone) {
-                return explode('/', $timezone)[0];
-            })
-            ->map(function ($group) {
-                return $group->mapWithKeys(function ($timezone) {
-                    return [$timezone => str_replace('_', ' ', $timezone)];
-                });
-            })
-            ->toArray();
+        $timezones = Cache::remember('timezone_list', 86400, function () {
+            return collect(timezone_identifiers_list())
+                ->groupBy(function ($timezone) {
+                    return explode('/', $timezone)[0];
+                })
+                ->map(function ($group) {
+                    return $group->mapWithKeys(function ($timezone) {
+                        return [$timezone => str_replace('_', ' ', $timezone)];
+                    });
+                })
+                ->toArray();
+        });
 
         return Inertia::render('offices/create', [
             "timezones" => $timezones

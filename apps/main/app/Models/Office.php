@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\CacheInvalidationService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,9 @@ class Office extends Model
         "timezone"
     ];
 
+    /*
+    * Relationships
+    */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -30,6 +34,9 @@ class Office extends Model
         return $this->hasMany(Floor::class);
     }
 
+    /*
+    * Methods
+    */
     public function getCurrentTime(): Carbon
     {
         return now()->setTimezone($this->timezone);
@@ -45,5 +52,16 @@ class Office extends Model
     public function getTodayInOfficeTimezone(): Carbon
     {
         return $this->getCurrentTime()->startOfDay();
+    }
+
+    protected static function booted()
+    {
+        static::saved(function ($office) {
+            CacheInvalidationService::invalidateOfficeCache($office->id, $office->user_id);
+        });
+
+        static::deleted(function ($office) {
+            CacheInvalidationService::invalidateOfficeCache($office->id, $office->user_id);
+        });
     }
 }
