@@ -35,256 +35,189 @@ DeskGrid is a comprehensive, open-source workspace management solution designed 
 
 ---
 
-## 🎯 Features
+## Features
 
-### 🗓️ Smart Reservations
+- 🏢 **Office Management** - Create and manage multiple office locations
+- 📋 **Floor Plans** - Upload and manage interactive floor plans with desk positioning
+- 🪑 **Desk Reservations** - Easy-to-use desk booking system with real-time availability
+- 👥 **User Management** - Employee management with role-based access control
+- 📊 **Analytics Dashboard** - Monitor office utilization and booking statistics
+- 🔒 **Demo Mode** - Safe demonstration mode for testing and presentations
+- 📧 **Email Notifications** - User invitation system with email integration via Resend
+- 🗂️ **File Management** - Secure file storage with MinIO/S3 compatibility
+- 🔍 **Application Monitoring** - Built-in monitoring with Laravel Nightwatch
 
-- **Visual Floor Plans** - Interactive desk booking with custom layouts
-- **Intelligent Suggestions** - AI-powered recommendations based on preferences
-- **Team Proximity** - Book desks near team members
-- **Availability Patterns** - Learn from usage data for better suggestions
+## Tech Stack
 
-### 🏢 Multi-Office Management
+- **Backend**: Laravel 12 (PHP 8.4+)
+- **Frontend**: React 19 with TypeScript
+- **UI Framework**: Tailwind CSS with Radix UI components
+- **Database**: PostgreSQL 17
+- **Storage**: MinIO (S3-compatible)
+- **Cache**: Redis
+- **Development**: Laravel Sail (Docker)
+- **Build Tool**: Vite
+- **State Management**: Zustand
+- **Testing**: Pest PHP
+- **Email Service**: Resend
+- **Monitoring**: Laravel Nightwatch
 
-- **Unlimited Offices** - Manage multiple locations
-- **Custom Floor Plans** - Upload and customize office layouts
-- **Zone Management** - Organize desks by departments or teams
-- **Flexible Configurations** - Adapt to any office setup
+## Requirements
 
-### 👥 User & Team Management
+- Docker and Docker Compose
+- PHP 8.4+ (if running locally)
+- Node.js 18+ and pnpm
+- Git
 
-- **Role-Based Access** - Admin, manager, and employee permissions
-- **Department Organization** - Group users by teams or departments
-- **User Invitations** - Email-based invitation system
-- **Profile Management** - Comprehensive user profiles
+## Quick Start
 
-### 📊 Analytics & Insights
-
-- **Utilization Reports** - Track desk usage and occupancy rates
-- **Popular Spaces** - Identify high-demand areas
-- **Optimization Opportunities** - Data-driven workspace improvements
-- **Export Capabilities** - Download reports and analytics
-
-### 🔧 Administrative Tools
-
-- **Real-time Updates** - Live availability status
-- **Bulk Operations** - Manage multiple reservations at once
-- **Notification System** - Email and in-app notifications
-- **Audit Logs** - Track all system activities
-
----
-
-## 🛠️ Technology Stack
-
-<div align="center">
-
-### Backend
-
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-
-### Frontend
-
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Inertia.js](https://img.shields.io/badge/Inertia.js-9553E9?style=for-the-badge&logo=inertia&logoColor=white)
-
-### Tools & Infrastructure
-
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![Pest](https://img.shields.io/badge/Pest-8A9A5B?style=for-the-badge&logo=pest&logoColor=white)
-
-</div>
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Docker** and **Docker Compose**
-- **Git**
-
-That's it! Laravel Sail handles everything else for you.
-
-### 🚢 Installation with Laravel Sail
-
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/m1thrandir225/deskgrid.git
-   cd deskgrid/apps/main
-   ```
-
-2. **Install Composer dependencies** (one-time setup)
-
-   ```bash
-   docker run --rm \
-       -u "$(id -u):$(id -g)" \
-       -v "$(pwd):/var/www/html" \
-       -w /var/www/html \
-       laravelsail/php84-composer:latest \
-       composer install --ignore-platform-reqs
-   ```
-
-3. **Copy environment file**
-
-   ```bash
-   cp .env.example .env
-   ```
-
-4. **Start the application with Sail**
-
-   ```bash
-   ./vendor/bin/sail up -d
-   ```
-
-5. **Generate application key**
-
-   ```bash
-   ./vendor/bin/sail artisan key:generate
-   ```
-
-6. **Run database migrations and seed**
-
-   ```bash
-   ./vendor/bin/sail artisan migrate:fresh --seed
-   ```
-
-7. **Install and build frontend dependencies**
-
-   ```bash
-   ./vendor/bin/sail pnpm install
-   ./vendor/bin/sail pnpm run build
-   ```
-
-8. **Access the application**
-   - Main App: http://localhost
-   - Mailpit (email testing): http://localhost:8025
-   - Database: localhost:3306 (MySQL) or localhost:5432 (PostgreSQL)
-
-### 🔧 Development Commands
+### 1. Clone the Repository
 
 ```bash
-# Start all services
+git clone https://github.com/m1thrandir225/deskgrid.git
+cd deskgrid/apps/main
+```
+
+### 2. Setup Environment
+
+```bash
+# Copy environment file
+cp .env.example .env
+
+# Generate application key
+./vendor/bin/sail artisan key:generate
+```
+
+### 3. Configure Environment Variables
+
+Update your `.env` file with the following configuration:
+
+```env
+# File Storage (MinIO Configuration)
+FILESYSTEM_DISK=s3
+AWS_ACCESS_KEY_ID=sail
+AWS_SECRET_ACCESS_KEY=password
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=deskgrid
+AWS_URL=http://localhost:9000/deskgrid
+AWS_ENDPOINT=http://minio:9000
+AWS_USE_PATH_STYLE_ENDPOINT=true
+
+# MinIO Service Configuration
+MINIO_ROOT_USER=sail
+MINIO_ROOT_PASSWORD=password
+FORWARD_MINIO_PORT=9000
+FORWARD_MINIO_CONSOLE_PORT=8900
+
+# Mail Configuration (Optional - for user invitations)
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+
+# Mail Configuration (If using Resend as Mail Provider)
+MAIL_MAILER=resend
+MAIL_SCHEME=null
+MAIL_HOST=null
+MAIL_PORT=null
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS= Your Address
+MAIL_FROM_NAME="${APP_NAME}"
+
+RESEND_API_KEY=YOUR_RESEND_KEY
+```
+
+### 4. Install Dependencies
+
+```bash
+# Install PHP dependencies
+composer install
+
+# Install Node.js dependencies
+pnpm install
+```
+
+### 5. Start the Application
+
+```bash
+# Start all services (Laravel, PostgreSQL, Redis, MinIO)
 ./vendor/bin/sail up -d
 
-# Stop all services
-./vendor/bin/sail down
-
-# View logs
-./vendor/bin/sail logs
-
-# Run artisan commands
-./vendor/bin/sail artisan migrate
-./vendor/bin/sail artisan tinker
-
-# Frontend development
-./vendor/bin/sail pnpm run dev
-
-# Run tests
-./vendor/bin/sail artisan test
-./vendor/bin/sail pnpm test
-
-# Access container shell
-./vendor/bin/sail shell
+# Run database migrations and seeders
+./vendor/bin/sail artisan migrate --seed
 ```
 
-### ⚡ Sail Alias (Optional but Recommended)
+### 6. Access the Application
 
-Add this to your shell profile (`.bashrc`, `.zshrc`, etc.):
+- **Main Application**: http://localhost
+- **MinIO Console**: http://localhost:8900 (login: sail/password)
+- **Mailpit (Email Testing)**: http://localhost:8025
+
+## Demo Mode
+
+Demo mode provides a safe environment for testing and demonstrations without affecting production data. It includes pre-configured demo users and sample data.
+
+### Features
+
+- **User Restrictions**: Prevents user registration and destructive actions
+- **Pre-configured Users**: Automatic creation of demo admin and employee accounts
+- **Sample Data**: Includes demo office with floor plans and desk layouts
+- **Safe Environment**: Blocks deletion, updates, and sensitive operations
+
+### Running Demo Mode
+
+1. **Enable Demo Mode**:
+
+```env
+DEMO_MODE=true
+DEMO_MAX_USERS=2
+DEMO_ADMIN_EMAIL=admin@demo.deskgrid.com
+DEMO_USER_EMAIL=user@demo.deskgrid.com
+DEMO_PASSWORD=demo123
+```
+
+2. **Start the Application**:
 
 ```bash
-alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan migrate --seed
 ```
 
-Then you can use `sail` instead of `./vendor/bin/sail`:
+3. **Login Credentials**:
+   - **Admin**: admin@demo.deskgrid.com / demo123
+   - **Employee**: user@demo.deskgrid.com / demo123
 
-```bash
-sail up -d
-sail artisan migrate
-sail pnpm run dev
-```
+### Demo Restrictions
 
-### 💻 Manual Installation
+When demo mode is enabled, the following actions are restricted:
 
-<details>
-<summary>Click to expand manual installation steps</summary>
+- User registration and deletion
+- Office creation, updates, and deletion
+- Floor plan creation, updates, and deletion
+- Employee management (create, edit, delete, import)
+- Desk deletion
+- Password resets and profile updates
+- System settings modifications
 
-1. **Clone and setup**
+### Demo Data
 
-   ```bash
-   git clone https://github.com/m1thrandir225/deskgrid.git
-   cd deskgrid
-   ```
+Demo mode automatically creates:
 
-2. **Backend setup**
+- **Demo Office**: A sample office with address "123 Demo Street"
+- **Floor Plans**: Ground Floor and First Floor with pre-configured layouts
+- **Demo Users**: Admin and employee accounts with appropriate roles
+- **Sample Desks**: Configured desk layouts for demonstration
 
-   ```bash
-   cd apps/main
-   composer install
-   cp .env.example .env
-   php artisan key:generate
-   ```
+## Production Deployment
 
-3. **Configure database in `.env`**
+### Local Docker Production Setup
 
-   ```env
-   DB_CONNECTION=pgsql
-   DB_HOST=127.0.0.1
-   DB_PORT=5432
-   DB_DATABASE=deskgrid
-   DB_USERNAME=your_username
-   DB_PASSWORD=your_password
-   ```
+For self-hosted production deployments using Docker:
 
-4. **Run migrations and seed**
-
-   ```bash
-   php artisan migrate:fresh --seed
-   ```
-
-5. **Frontend setup**
-
-   ```bash
-   pnpm install
-   pnpm run build
-   ```
-
-6. **Start the application**
-   ```bash
-   php artisan serve
-   ```
-
-</details>
-
----
-
-## 📖 Documentation
-
-### 🏗️ Project Structure
-
-```
-DeskGrid/
-├── apps/
-│   ├── main/           # Laravel application
-│   │   ├── app/        # PHP application logic
-│   │   ├── resources/  # Frontend React components
-│   │   ├── routes/     # API and web routes
-│   │   └── database/   # Migrations and seeders
-│   └── landing/        # Next.js landing page
-├── packages/           # Shared packages
-└── docs/              # Documentation
-```
-
-### 🔧 Configuration
-
-#### Environment Variables
-
-Key environment variables for the main application:
+1. **Create Production Environment File**:
 
 ```env
 # Application
@@ -293,273 +226,324 @@ APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://your-domain.com
 
-# Database
+# Database (Use external PostgreSQL for production)
 DB_CONNECTION=pgsql
-DB_HOST=localhost
+DB_HOST=your-postgres-host
 DB_PORT=5432
-DB_DATABASE=deskgrid
+DB_DATABASE=deskgrid_prod
+DB_USERNAME=your-db-user
+DB_PASSWORD=your-secure-password
 
-# Mail (for invitations)
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.example.com
-MAIL_PORT=587
+# Redis (Use external Redis for production)
+REDIS_HOST=your-redis-host
+REDIS_PASSWORD=your-redis-password
+REDIS_PORT=6379
 
-# Demo Mode (optional)
-DEMO_ENABLED=false
+# File Storage (Production MinIO or AWS S3)
+FILESYSTEM_DISK=s3
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=deskgrid-production
+AWS_URL=https://your-minio-domain.com/deskgrid-production
+AWS_ENDPOINT=https://your-minio-domain.com
+AWS_USE_PATH_STYLE_ENDPOINT=true
+
+# Email via Resend
+MAIL_MAILER=resend
+RESEND_KEY=your-resend-api-key
+MAIL_FROM_ADDRESS=noreply@your-domain.com
+MAIL_FROM_NAME="DeskGrid"
+
+# Session and Cache
+SESSION_DRIVER=redis
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+
+# Disable Demo Mode
+DEMO_MODE=false
 ```
 
-#### Customization
+And deploy like you would any other Laravel application to your desired cloud or local provider.
 
-- **Branding**: Replace logos in `public/` directory
-- **Colors**: Update theme colors in `tailwind.config.js`
-- **Features**: Enable/disable features in `config/app.php`
+### Laravel Cloud Deployment
 
-### 🗃️ Database Schema
+The app is made to work with an easy deployment to Laravel Cloud.
 
-Core entities and relationships:
+1. **Fork the Github Repository.**
 
-- **Users** - System users with role-based permissions
-- **Offices** - Physical office locations
-- **Floors** - Floor plans within offices
-- **Desks** - Individual workstations with positions
-- **Reservations** - Desk bookings with dates and status
+2. **Create an account at [Laravel Cloud](https://cloud.laravel.com/)**
 
----
+3. **Connect your Github account to Laravel Cloud.**
 
-## 🧪 Testing
+4. **Add your repository as an application.**
 
-DeskGrid includes comprehensive test suites:
+5. **Add the required services: Postgres & Laravel KV(Redis).**
+
+6. **Add the following configuration to deploy to Laravel Cloud, it's a current workaround until they add official monorepo support:**
+
+```bash
+# ---------------------------------
+# Deploying the "apps/main" directory
+# ---------------------------------
+
+# Step 1: Create a temporary directory
+mkdir /tmp/monorepo_tmp
+
+# Step 2: Create an array with all subdirectories (your actual directories)
+repos=("apps")
+
+# Step 3: Move all subdirectories to the temporary directory
+for item in "${repos[@]}"; do
+  mv $item /tmp/monorepo_tmp/
+done
+
+# Step 4: Move the desired subdirectory into root
+cp -Rf /tmp/monorepo_tmp/apps/main/{.,}* .
+
+# Step 5: Remove the temporary directory
+rm -rf /tmp/monorepo_tmp
+
+# Step 6: Ensure storage directories exist
+mkdir -p storage/framework/cache/data
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/logs
+chmod -R 755 storage bootstrap/cache
+
+# Step 7: Proceed with build steps
+composer install --no-dev --optimize-autoloader
+npm install -g pnpm
+pnpm install
+pnpm run build
+
+# Step 8: Laravel optimizations
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan migrate --force
+```
+
+7. **All the other variables are automatically injected via their online console, be sure to add your custom Mail provider and the key. For Resend read below ⬇️**
+
+**If you have any issues feel free to reach out I will try to help out if I can.**
+
+### Email Configuration with Resend
+
+DeskGrid includes built-in support for Resend email service for user invitations and notifications:
+
+1. **Get Resend API Key**:
+
+   - Sign up at [resend.com](https://resend.com)
+   - Create an API key in your dashboard
+   - Verify your sending domain
+
+2. **Configure Environment**:
+
+```env
+MAIL_MAILER=resend
+RESEND_KEY=re_your_api_key_here
+MAIL_FROM_ADDRESS=noreply@your-verified-domain.com
+MAIL_FROM_NAME="DeskGrid"
+```
+
+3. **Email Features**:
+   - **User Invitations**: Automatic email invitations when importing employees
+   - **Password Reset**: Secure password reset links
+   - **System Notifications**: Admin notifications for important events
+
+### Application Monitoring with Laravel Nightwatch
+
+DeskGrid includes Laravel Nightwatch for comprehensive application monitoring:
+
+1. **Nightwatch Configuration**:
+
+```env
+# Nightwatch automatically included
+NIGHTWATCH_TOKEN=YOUR_TOKEN
+...
+#Other env settings from the Nightwatch dashboard.
+```
+
+2. **Monitoring Features**:
+
+   - **Performance Monitoring**: Track response times and database queries
+   - **Error Tracking**: Automatic error reporting and stack traces
+   - **Resource Usage**: Monitor memory, CPU, and disk usage
+   - **Custom Metrics**: Track desk reservations, user activity, and office utilization
+
+3. **Access Monitoring Dashboard**:
+   - Available in Laravel Cloud dashboard
+   - Real-time metrics and alerts
+   - Historical performance data
+
+## Development
+
+### Running in Development Mode
+
+The application includes a comprehensive development setup:
+
+```bash
+# Start development environment with hot reloading
+./vendor/bin/sail up -d
+composer dev
+```
+
+This command runs:
+
+- Laravel development server
+- Queue worker
+- Log monitoring (Pail)
+- Vite development server with hot reloading
+
+### Database Management
+
+```bash
+# Run migrations
+./vendor/bin/sail artisan migrate
+
+# Run seeders
+./vendor/bin/sail artisan db:seed
+
+# Reset database with fresh data
+./vendor/bin/sail artisan migrate:fresh --seed
+
+# Create new migration
+./vendor/bin/sail artisan make:migration create_example_table
+```
+
+### File Storage
+
+The application uses MinIO for file storage, which provides S3-compatible object storage:
+
+- Floor plan images are automatically uploaded to the `deskgrid` bucket
+- Files are publicly accessible for easy sharing
+- Automatic bucket creation on startup
+- Compatible with AWS S3 for production deployments
+
+### Code Quality
 
 ```bash
 # Run PHP tests
-./vendor/bin/pest
+./vendor/bin/sail test
 
-# Run TypeScript tests
-pnpm test
+# Format PHP code
+./vendor/bin/sail pint
 
-# Run with coverage
-./vendor/bin/pest --coverage
+# Format frontend code
+pnpm format
+
+# Lint frontend code
+pnpm lint
+
+# Type check TypeScript
+pnpm type-check
 ```
 
-### Test Categories
+## Configuration
 
-- **Unit Tests** - Core business logic
-- **Feature Tests** - API endpoints and workflows
-- **Browser Tests** - End-to-end user flows
+### Storage Configuration
 
----
+Switch between storage providers by updating the `FILESYSTEM_DISK` environment variable:
 
-## 🚀 Deployment
+- `local` - Local file system
+- `s3` - MinIO or AWS S3
+- `public` - Publicly accessible local storage
 
-### Production Deployment with Sail
+### Email Configuration Options
 
-Laravel Sail can also be used for production deployments with some modifications.
+DeskGrid supports multiple email providers:
 
-1. **Prepare for production**
-
-   ```bash
-   # Clone repository on server
-   git clone https://github.com/m1thrandir225/deskgrid.git
-   cd deskgrid/apps/main
-
-   # Install dependencies
-   docker run --rm \
-       -u "$(id -u):$(id -g)" \
-       -v "$(pwd):/var/www/html" \
-       -w /var/www/html \
-       laravelsail/php84-composer:latest \
-       composer install --no-dev --optimize-autoloader --ignore-platform-reqs
-   ```
-
-2. **Configure production environment**
-
-   ```bash
-   cp .env.example .env
-   # Edit .env with production settings:
-   # - Set APP_ENV=production
-   # - Set APP_DEBUG=false
-   # - Configure your database
-   # - Set proper APP_URL
-   # - Configure mail settings
-   ```
-
-3. **Modify docker-compose.yml for production**
-
-   ```yaml
-   # Add to docker-compose.yml
-   services:
-     laravel.test:
-       ports:
-         - "80:80"
-         - "443:443"
-       environment:
-         - APP_ENV=production
-         - APP_DEBUG=false
-   ```
-
-4. **Deploy and optimize**
-
-   ```bash
-   # Start services
-   ./vendor/bin/sail up -d
-
-   # Generate key and run migrations
-   ./vendor/bin/sail artisan key:generate
-   ./vendor/bin/sail artisan migrate --force
-
-   # Install and build frontend
-   ./vendor/bin/sail pnpm install
-   ./vendor/bin/sail pnpm run build
-
-   # Optimize for production
-   ./vendor/bin/sail artisan config:cache
-   ./vendor/bin/sail artisan route:cache
-   ./vendor/bin/sail artisan view:cache
-   ```
-
-### SSL/HTTPS Configuration
-
-For HTTPS in production, you can:
-
-1. **Use a reverse proxy** (recommended)
-
-   - Nginx Proxy Manager
-   - Traefik
-   - Cloudflare
-
-2. **Modify Sail's nginx configuration**
-
-   ```bash
-   # Publish Sail's docker files
-   ./vendor/bin/sail artisan sail:publish
-
-   # Edit docker/8.3/nginx.conf to add SSL configuration
-   ```
-
-### Environment Variables for Production
-
-Key production environment variables:
+#### Resend (Recommended for Production)
 
 ```env
-# Application
-APP_NAME=DeskGrid
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://your-domain.com
+MAIL_MAILER=resend
+RESEND_KEY=your-api-key
+MAIL_FROM_ADDRESS=noreply@yourdomain.com
+MAIL_FROM_NAME="DeskGrid"
+```
 
-# Database (Sail MySQL)
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=deskgrid
-DB_USERNAME=sail
-DB_PASSWORD=password
+#### SMTP
 
-# Mail
+```env
 MAIL_MAILER=smtp
 MAIL_HOST=your-smtp-host
 MAIL_PORT=587
-MAIL_USERNAME=your-email
+MAIL_USERNAME=your-username
 MAIL_PASSWORD=your-password
-
-# Cache (Redis via Sail)
-CACHE_DRIVER=redis
-REDIS_HOST=redis
-REDIS_PASSWORD=null
-REDIS_PORT=6379
+MAIL_ENCRYPTION=tls
 ```
 
-### Backup and Maintenance
+#### Development (Mailpit)
 
-```bash
-# Database backup
-./vendor/bin/sail mysql mysqldump deskgrid > backup.sql
-
-# Update application
-git pull origin main
-./vendor/bin/sail composer install --no-dev --optimize-autoloader
-./vendor/bin/sail artisan migrate
-./vendor/bin/sail pnpm install && ./vendor/bin/sail pnpm run build
-./vendor/bin/sail artisan config:cache
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
 ```
 
-### Performance Optimization
+## API Documentation
 
-```bash
-# Enable OPcache (add to docker-compose.yml)
-# PHP_INI_SCAN_DIR: "/usr/local/etc/php/conf.d:/opt/docker/etc/php/opcache"
+The application provides RESTful APIs for:
 
-# Queue workers for background jobs
-./vendor/bin/sail artisan queue:work --daemon
+- Office management (`/api/offices`)
+- Floor management (`/api/floors`)
+- Desk management (`/api/desks`)
+- Reservation management (`/api/reservations`)
+- User management (`/api/users`)
 
-# Schedule tasks
-# Add to server crontab:
-# * * * * * cd /path-to-your-project && ./vendor/bin/sail artisan schedule:run >> /dev/null 2>&1
-```
+## Troubleshooting
 
----
+### Common Issues
 
-## 🤝 Contributing
+1. **MinIO Connection Issues**:
 
-We welcome contributions from the community! Here's how you can help:
+   ```bash
+   # Check MinIO service status
+   ./vendor/bin/sail logs minio
 
-### Getting Started
+   # Restart MinIO service
+   ./vendor/bin/sail restart minio
+   ```
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests (`./vendor/bin/pest && pnpm test`)
-5. Commit changes (`git commit -m 'Add amazing feature'`)
-6. Push to branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+2. **Database Connection Issues**:
 
-### Development Guidelines
+   ```bash
+   # Check PostgreSQL status
+   ./vendor/bin/sail logs pgsql
 
-- Follow PSR-12 coding standards for PHP
-- Use Prettier and ESLint for TypeScript/React
-- Write tests for new features
-- Update documentation as needed
+   # Reset database
+   ./vendor/bin/sail artisan migrate:fresh --seed
+   ```
 
-### Areas for Contribution
+3. **Permission Issues**:
 
-- 🌐 Internationalization (i18n)
-- 📱 Mobile app development
-- 🔌 Third-party integrations
-- 📊 Advanced analytics features
-- 🎨 UI/UX improvements
+   ```bash
+   # Fix storage permissions
+   sudo chown -R $USER:$USER storage bootstrap/cache
+   chmod -R 775 storage bootstrap/cache
+   ```
 
----
+4. **Asset Build Issues**:
 
-## 📄 License
+   ```bash
+   # Clear Node modules and reinstall
+   rm -rf node_modules
+   pnpm install
+   pnpm build
+   ```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+5. **Email Delivery Issues**:
+   ```bash
+   # Test email configuration
+   ./vendor/bin/sail artisan tinker
+   Mail::raw('Test email', function($message) {
+       $message->to('test@example.com')->subject('Test');
+   });
+   ```
 
----
+## License
 
-## 🙏 Acknowledgments
+This project is open-sourced software licensed under the [MIT license](LICENSE).
 
-- Built with [Laravel](https://laravel.com) and [React](https://reactjs.org)
-- UI components from [Shadcn/ui](https://ui.shadcn.com)
-- Icons by [Lucide](https://lucide.dev)
-- Styled with [Tailwind CSS](https://tailwindcss.com)
-
----
-
-## 📞 Support & Community
-
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/m1thrandir225/deskgrid/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/m1thrandir225/deskgrid/discussions)
-- 📧 **Email**: support@deskgrid.com
-- 🌐 **Website**: [deskgrid.com](https://deskgrid.com)
-
----
-
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./apps/landing/public/logo_text_dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="./apps/landing/public/logo_text.png">
-    <img src="./apps/landing/public/logo_text.png" alt="DeskGrid" width="200" height="auto" />
-  </picture>
-  <p>Made with ❤️ by <a href="https://sebastijanzindl.me">Sebastijan Zindl</a></p>
-  <p>⭐ Star this repository if you find it helpful!</p>
-</div>
+Built with ❤️ using Laravel and React
