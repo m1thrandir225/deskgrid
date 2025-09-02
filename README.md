@@ -14,7 +14,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC.svg)](https://tailwindcss.com)
 
-[🚀 Live Demo](https://demo.deskgrid.com) • [📖 Documentation](#documentation) • [🛠️ Installation](#installation) • [🎯 Features](#features)
+[🚀 Live Demo](https://deskgrid-demo.sebastijanzindl.me)
 
 </div>
 
