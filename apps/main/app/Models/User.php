@@ -67,15 +67,29 @@ class User extends Authenticatable
         return $this->hasMany(Reservation::class);
     }
 
+    public function reservationNotifications(): HasMany
+    {
+        return $this->hasMany(ReservationNotification::class);
+    }
+
     protected function hasSetPassword(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->password !== null,
+            get: fn() => $this->password !== null,
         );
     }
 
     public function hasReservationToday(): bool
     {
         return $this->reservations()->whereDate("reservation_date", today())->exists();
+    }
+
+    public function hasNotificationFor(int $deskId, string $date): bool
+    {
+        return $this->reservationNotifications()
+            ->where('desk_id', $deskId)
+            ->where('reservation_date', $date)
+            ->where('notified', false)
+            ->exists();
     }
 }

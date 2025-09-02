@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ReservationStatus;
 use App\Http\Requests\Reservation\CreateReservationRequest;
 use App\Http\Requests\Reservation\UpdateReservationRequest;
+use App\Jobs\SendReservationCancelledNotifications;
 use App\Models\Desk;
 use App\Models\Floor;
 use App\Models\Office;
@@ -31,7 +32,7 @@ class ReservationController extends Controller
 
         $floors = collect();
 
-        if($selectedOfficeId) {
+        if ($selectedOfficeId) {
             $floors = Floor::query()
                 ->where('office_id', $selectedOfficeId)
                 ->get();
@@ -47,7 +48,7 @@ class ReservationController extends Controller
 
         $desks = collect();
 
-        if($selectedFloorId) {
+        if ($selectedFloorId) {
             $desks = Desk::query()
                 ->with("floor")
                 ->with(['reservations' => function ($query) use ($startDate, $endDate) {
@@ -98,7 +99,7 @@ class ReservationController extends Controller
         $validated = $request->validated();
         $today = now();
 
-        if($today == $validated['reservation_date'] && $today->hour >= 9) {
+        if ($today == $validated['reservation_date'] && $today->hour >= 9) {
             return back()->with("error", "Reservations can only be made before 9am today.");
         }
 
@@ -108,10 +109,21 @@ class ReservationController extends Controller
             ->whereNotIn("status", [ReservationStatus::Cancelled])
             ->first();
 
-        if($existingReservation) {
+        if ($existingReservation) {
             return back()->with("error", "You already have a reservation for today. Please cancel your existing reservation before making a new one.");
         }
 
+        $existingDeskReservation = Reservation::query()
+            ->where('desk_id', $validated['desk_id'])
+            ->where('reservation_date', $validated['reservation_date'])
+            ->whereNotIn("status", [ReservationStatus::Cancelled])
+            ->first();
+
+        if ($existingDeskReservation) {
+            return back()->with("error", "This desk is already reserved for the selected date. Please cancel the existing reservation before making a new one.");
+        }
+
+        //TODO: send to a queue with a status of pending
         $reservation = Reservation::create([
             'desk_id' => $validated['desk_id'],
             'user_id' => $request->user()->id,
@@ -163,7 +175,15 @@ class ReservationController extends Controller
     {
         Gate::authorize('delete', $reservation);
 
-        $reservation->delete();
+        $deskId = $reservation->desk_id;
+        $reservationDate = $reservation->reservation_date->toDateString();
+
+        $reservation->update([
+            "status" => ReservationStatus::Cancelled
+        ]);
+
+        //Send notification to the users who are waiting for this desk
+        SendReservationCancelledNotifications::dispatch($deskId, $reservationDate);
 
         return back()->with("message", "Reservation cancelled.");
     }
@@ -188,7 +208,7 @@ class ReservationController extends Controller
 
         $reservations->each(function ($reservation) {
             $floor = $reservation->desk->floor;
-            if ($floor)  {
+            if ($floor) {
                 $plan_image = $reservation->desk->floor()->first()->plan_image;
                 if (config("demo.enabled")) {
                     $reservation->desk->floor->plan_image_url = asset($plan_image);
@@ -196,7 +216,6 @@ class ReservationController extends Controller
                     $reservation->desk->floor->plan_image_url = asset(Storage::url($plan_image));
                 }
             }
-
         });
 
         return Inertia::render("reservations/my-reservations", [
@@ -206,6 +225,5 @@ class ReservationController extends Controller
                 "end_date" => $endDate->toDateString(),
             ]
         ]);
-
     }
 }

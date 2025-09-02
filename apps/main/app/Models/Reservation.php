@@ -19,6 +19,11 @@ class Reservation extends Model
         'status',
     ];
 
+    protected $casts = [
+        'reservation_date' => 'date:Y-m-d',
+        'status' => ReservationStatus::class,
+    ];
+
     public function desk(): BelongsTo
     {
         return $this->belongsTo(Desk::class);

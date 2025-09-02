@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,7 +19,9 @@ return new class () extends Migration {
             $table->enum("status", array_column(ReservationStatus::cases(), 'value'))->default(ReservationStatus::Pending);
             $table->timestamps();
 
-            $table->unique(["desk_id", "reservation_date", "status"]);
+            $table->index(["desk_id", "reservation_date"]);
+            $table->index(["user_id", "reservation_date"]);
+            $table->index(["status"]);
         });
     }
 

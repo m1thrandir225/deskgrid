@@ -1,3 +1,4 @@
+import { NotifyMeButton } from '@/components/NotifyMeButton';
 import { Button } from '@/components/ui/button';
 import WeekSelector from '@/components/week-selector';
 import { SharedData } from '@/types';
@@ -91,9 +92,12 @@ export const FloorViewerReservationPanel: React.FC<FloorViewerReservationPanelPr
                                                     Cancel
                                                 </Button>
                                             ) : (
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <span className="font-medium">Reserved by:</span>
-                                                    <span>{reservedBy}</span>
+                                                <div className="flex flex-col items-end gap-2">
+                                                    <NotifyMeButton deskId={desk.id} reservationDate={date} variant="outline" />
+                                                    <div className="flex items-center gap-2 text-sm text-indigo-400">
+                                                        <span className="font-medium">Reserved by:</span>
+                                                        <span>{reservedBy}</span>
+                                                    </div>
                                                 </div>
                                             )
                                         ) : (

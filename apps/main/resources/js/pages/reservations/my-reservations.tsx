@@ -2,6 +2,7 @@ import DeskLocationPopover from '@/components/desk/desk-location-popover';
 import { Button } from '@/components/ui/button';
 import WeekSelector from '@/components/week-selector';
 import AppLayout from '@/layouts/app-layout';
+import { getDateFromISOString } from '@/lib/utils';
 import { ReservationWithDesk } from '@/types/reservation';
 import { router } from '@inertiajs/react';
 import { addDays, format, startOfWeek } from 'date-fns';
@@ -69,7 +70,10 @@ const MyReservationsPage: React.FC<PageProps> = (props) => {
 
     const getReservationForDay = (date: Date) => {
         const dateString = format(date, 'yyyy-MM-dd');
-        return reservations.find((res) => res.reservation_date === dateString);
+        return reservations.find((res) => {
+            const reservationDate = getDateFromISOString(res.reservation_date);
+            return reservationDate === dateString;
+        });
     };
 
     const weekDays = getWeekDays();
