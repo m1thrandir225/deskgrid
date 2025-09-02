@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SendReservationCancelledNotifications implements ShouldQueue
@@ -55,5 +56,14 @@ class SendReservationCancelledNotifications implements ShouldQueue
 
             $notification->markAsNotified();
         }
+    }
+
+    public function failed(\Throwable $exception): void
+    {
+        Log::error("Failed to send reservation cancelled notification.", [
+            "desk_id" => $this->deskId,
+            "reservation_date" => $this->reservationDate,
+            "exception" => $exception->getMessage(),
+        ]);
     }
 }

@@ -10,8 +10,10 @@ use App\Models\Desk;
 use App\Models\Floor;
 use App\Models\Office;
 use App\Models\Reservation;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -97,41 +99,57 @@ class ReservationController extends Controller
         Gate::authorize('create', Reservation::class);
 
         $validated = $request->validated();
-        $today = now();
 
-        if ($today == $validated['reservation_date'] && $today->hour >= 9) {
-            return back()->with("error", "Reservations can only be made before 9am today.");
+        $desk = Desk::with('floor.office')->findOrFail($validated['desk_id']);
+        $office = $desk->floor->office;
+
+        $officeToday = $office->getTodayInOfficeTimezone();
+        $reservationDate = Carbon::parse($validated['reservation_date']);
+
+        if ($reservationDate->isSameDay($officeToday)) {
+            $officeCurrentTime = $office->getCurrentTime();
+            if ($officeCurrentTime->hour >= 8) {
+                return back()->with("error", "Reservations for today can only be made before 8 AM office time ({$office->timezone}).");
+            }
         }
 
-        $existingReservation = Reservation::query()
-            ->where("user_id", $request->user()->id)
-            ->where("reservation_date", $today->toDateString())
-            ->whereNotIn("status", [ReservationStatus::Cancelled])
-            ->first();
+        try {
+            DB::transaction(function () use ($validated, $request, $reservationDate) {
+                $existingUserReservation = Reservation::query()
+                    ->where("user_id", $request->user()->id)
+                    ->where("reservation_date", $reservationDate->toDateString())
+                    ->whereNotIn("status", [ReservationStatus::Cancelled])
+                    ->lockForUpdate()
+                    ->first();
 
-        if ($existingReservation) {
-            return back()->with("error", "You already have a reservation for today. Please cancel your existing reservation before making a new one.");
+
+                if ($existingUserReservation) {
+                    throw new \Exception("You already have a reservation for this date. Please cancel your existing reservation before making a new one.");
+                }
+
+                $existingDeskReservation = Reservation::query()
+                    ->where('desk_id', $validated['desk_id'])
+                    ->where('reservation_date', $reservationDate->toDateString())
+                    ->whereNotIn("status", [ReservationStatus::Cancelled])
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($existingDeskReservation) {
+                    throw new \Exception("This desk is already reserved for the selected date.");
+                }
+
+                Reservation::create([
+                    'desk_id' => $validated['desk_id'],
+                    'user_id' => $request->user()->id,
+                    'reservation_date' => $reservationDate->toDateString(),
+                    'status' => ReservationStatus::Approved
+                ]);
+            });
+
+            return back()->with("message", "Reservation created successfully");
+        } catch (\Exception $e) {
+            return back()->with("error", $e->getMessage());
         }
-
-        $existingDeskReservation = Reservation::query()
-            ->where('desk_id', $validated['desk_id'])
-            ->where('reservation_date', $validated['reservation_date'])
-            ->whereNotIn("status", [ReservationStatus::Cancelled])
-            ->first();
-
-        if ($existingDeskReservation) {
-            return back()->with("error", "This desk is already reserved for the selected date. Please cancel the existing reservation before making a new one.");
-        }
-
-        //TODO: send to a queue with a status of pending
-        $reservation = Reservation::create([
-            'desk_id' => $validated['desk_id'],
-            'user_id' => $request->user()->id,
-            'reservation_date' => $validated['reservation_date'],
-            'status' => ReservationStatus::Approved
-        ]);
-
-        return back()->with("message", "Reservation created successfully");
     }
 
     /**

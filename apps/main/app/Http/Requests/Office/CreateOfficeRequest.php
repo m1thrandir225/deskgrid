@@ -7,8 +7,8 @@ use Illuminate\Foundation\Http\FormRequest;
 class CreateOfficeRequest extends FormRequest
 {
     /**
-    * Using policy gates to determine authorization
-    */
+     * Using policy gates to determine authorization
+     */
     public function authorize(): bool
     {
         return true;
@@ -23,7 +23,15 @@ class CreateOfficeRequest extends FormRequest
     {
         return [
             "name" => "required|string|max:255",
-            "address" => "required|string|max:255"
+            "address" => "required|string|max:255",
+            "timezone" => "required|string|in:" . implode(",", timezone_identifiers_list())
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'timezone.in' => 'Please select a valid timezone.',
         ];
     }
 }

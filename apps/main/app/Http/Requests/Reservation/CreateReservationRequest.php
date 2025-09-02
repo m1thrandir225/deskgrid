@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Reservation;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateReservationRequest extends FormRequest
@@ -15,7 +16,18 @@ class CreateReservationRequest extends FormRequest
     {
         return [
             "desk_id" => ["required", "exists:desks,id"],
-            "reservation_date" => "required|after:today",
+            "reservation_date" => [
+                "required",
+                "date",
+                "after_or_equal:today",
+                "before:" . now()->addDays(14)->toDateString(), // max 2 weeks  from now,
+                function ($attribute, $value, $fail) {
+                    $date = Carbon::parse($value);
+                    if ($date->isWeekend()) {
+                        $fail('Reservations can only be made for weekdays.');
+                    }
+                }
+            ],
         ];
     }
 }

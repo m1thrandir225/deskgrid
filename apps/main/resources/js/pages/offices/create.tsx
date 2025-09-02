@@ -19,12 +19,19 @@ const breadcrumbs: BreadcrumbItem[] = [
 export type CreateOfficeForm = {
     name: string;
     address: string;
+    timezone: string;
 };
 
-const CreateOfficePage: React.FC = () => {
+type PageProps = {
+    timezones: Record<string, Record<string, string>>;
+};
+
+const CreateOfficePage: React.FC<PageProps> = (props) => {
+    const { timezones } = props;
     const { data, setData, post, processing, errors, reset } = useForm<CreateOfficeForm>({
         name: '',
         address: '',
+        timezone: 'UTC',
     });
 
     const handleSubmit: FormEventHandler = (e) => {
@@ -45,6 +52,8 @@ const CreateOfficePage: React.FC = () => {
         type: 'create',
         onSubmit: handleSubmit,
         addressValue: data.address,
+        timezoneValue: data.timezone,
+        timezones: timezones,
     };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

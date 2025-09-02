@@ -15,9 +15,9 @@ use Inertia\Response;
 class OfficeController extends Controller
 {
     /**
-    * Render index page for all offices that are avaliable to
-    * the user
-    */
+     * Render index page for all offices that are avaliable to
+     * the user
+     */
     public function index(Request $request): Response
     {
         $user = $request->user();
@@ -29,20 +29,33 @@ class OfficeController extends Controller
         ]);
     }
     /**
-    * Show the create office page.
-    */
+     * Show the create office page.
+     */
     public function create(Request $request): Response
     {
         Gate::authorize('create', Office::class);
 
-        return Inertia::render('offices/create');
+        $timezones = collect(timezone_identifiers_list())
+            ->groupBy(function ($timezone) {
+                return explode('/', $timezone)[0];
+            })
+            ->map(function ($group) {
+                return $group->mapWithKeys(function ($timezone) {
+                    return [$timezone => str_replace('_', ' ', $timezone)];
+                });
+            })
+            ->toArray();
+
+        return Inertia::render('offices/create', [
+            "timezones" => $timezones
+        ]);
     }
 
     /**
-    * Handle an incoming new office request
-    *
-    * @throws \Illuminate\Validation\ValidationException
-    */
+     * Handle an incoming new office request
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function store(CreateOfficeRequest $request): RedirectResponse
     {
         Gate::authorize('create', Office::class);
@@ -53,16 +66,17 @@ class OfficeController extends Controller
         Office::create([
             'name' => $validated['name'],
             'address' => $validated['address'],
-            'user_id' => $user->id
+            'user_id' => $user->id,
+            "timezone" => $validated['timezone']
         ]);
 
         return to_route('offices.index');
     }
 
     /**
-    * Show the current desk
-    * -> should include all desks
-    */
+     * Show the current desk
+     * -> should include all desks
+     */
     public function show(Office $office)
     {
 
@@ -113,6 +127,5 @@ class OfficeController extends Controller
 
         $office->delete();
         return to_route('offices.index');
-
     }
 }
