@@ -1,6 +1,6 @@
-import {Logo} from "@/components/logo";
-import {Badge} from "@/components/ui/badge";
-import {Button} from "@/components/ui/button";
+import { Logo } from "@/components/logo";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 
 export default function Home() {
-  const demoURL = process.env.DEMO_URL;
+  const demoURL = process.env.NEXT_PUBLIC_DEMO_URL;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
@@ -126,10 +126,14 @@ export default function Home() {
             {/* Hero Stats */}
             <div className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               {[
-                {icon: Shield, label: "100% Open Source", desc: "MIT License"},
-                {icon: Globe, label: "Self-Hosted", desc: "Full Control"},
-                {icon: Zap, label: "Modern Stack", desc: "Latest Tech"},
-                {icon: Lock, label: "Secure", desc: "Privacy First"},
+                {
+                  icon: Shield,
+                  label: "100% Open Source",
+                  desc: "MIT License",
+                },
+                { icon: Globe, label: "Self-Hosted", desc: "Full Control" },
+                { icon: Zap, label: "Modern Stack", desc: "Latest Tech" },
+                { icon: Lock, label: "Secure", desc: "Privacy First" },
               ].map((item, index) => (
                 <div key={index} className="text-center">
                   <div className="flex justify-center mb-3">
